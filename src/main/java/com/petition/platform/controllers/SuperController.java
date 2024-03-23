@@ -1,6 +1,6 @@
 package com.petition.platform.controllers;
 
-import com.petition.platform.models.User;
+import com.petition.platform.models.SimpleUser;
 import com.petition.platform.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,13 +18,13 @@ public class SuperController {
 
     @GetMapping("/add")
     public String addUser(Model model){
-        model.addAttribute(new User());
+        model.addAttribute(new SimpleUser());
         return "super-add";
     }
 
     @PostMapping("/add")
-    public String addUser(User user){
-        return customUserDetailsService.addUser(user) ? "redirect:/super/add?success" : "redirect:/super/add?failure";
+    public String addUser(SimpleUser simpleUser){
+        return customUserDetailsService.addUser(simpleUser) ? "redirect:/super/add?success" : "redirect:/super/add?failure";
     }
 
 }

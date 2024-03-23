@@ -99,7 +99,7 @@
 </div>
 
 <main class="form-signin w-100 m-auto">
-    <form th:action="@{/auth/register}" method="post" th:object="${user}">
+    <form th:action="@{/auth/register}" method="post" th:object="${simpleUser}">
 
         <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.error}">
             This email is already used.

@@ -1,6 +1,6 @@
 package com.petition.platform.controllers;
 
-import com.petition.platform.models.User;
+import com.petition.platform.models.SimpleUser;
 import com.petition.platform.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,13 +18,13 @@ public class AuthController {
 
     @GetMapping("/register")
     public String register(Model model){
-        model.addAttribute(new User());
+        model.addAttribute(new SimpleUser());
         return "register";
     }
 
     @PostMapping("/register")
-    public String register(User user){
-        return userDetailsService.addSimpleUser(user) ? "login" : "redirect:/auth/register?error";
+    public String register(SimpleUser simpleUser){
+        return userDetailsService.addSimpleUser(simpleUser) ? "login" : "redirect:/auth/register?error";
     }
 
     @GetMapping("/login")

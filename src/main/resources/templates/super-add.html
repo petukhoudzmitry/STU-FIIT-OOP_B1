@@ -101,16 +101,16 @@
 
 
 <main class="form-signin w-100 m-auto">
-    <form th:action="@{/super/add}" method="post" th:object="${user}">
+    <form th:action="@{/super/add}" method="post" th:object="${simpleUser}">
 
-        <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.failure}">This user already exists</h2>
-        <h2 class="h3 mb-3 fw-normal" style="color: #0d6efd" th:if="${param.success}">New user was added</h2>
+        <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.failure}">This simpleUser already exists</h2>
+        <h2 class="h3 mb-3 fw-normal" style="color: #0d6efd" th:if="${param.success}">New simpleUser was added</h2>
 
         <h1 class="h3 mb-3 fw-normal">Add User</h1>
 
         <div class="form-floating">
             <select id="floatingSelect" class="form-select" th:field="*{role}" autocomplete="off">
-                <option value="user">User</option>
+                <option value="simpleUser">User</option>
                 <option value="admin">Admin</option>
                 <option value="Super">Super</option>
             </select>
