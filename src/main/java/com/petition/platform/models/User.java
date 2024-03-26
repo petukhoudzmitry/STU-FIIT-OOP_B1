@@ -1,18 +1,18 @@
 package com.petition.platform.models;
 
+import com.petition.platform.roles.Roles;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @MappedSuperclass
-public abstract class AbstractUser {
+public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
-    protected UUID id;
+    protected Long id;
 
     @Column(name = "name", length = 50, nullable = false)
     protected String username;
@@ -33,9 +33,9 @@ public abstract class AbstractUser {
     protected LocalDateTime updatedAt;
 
     @Column(name = "role", length = 15, nullable = false)
-    protected String role;
+    protected Roles role;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractUser {
         return enabled;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -91,12 +91,12 @@ public abstract class AbstractUser {
         this.updatedAt = updatedAt;
     }
 
-    public String getRole() {
+    public Roles getRole() {
         return role;
     }
 
-    public void setRole(String role) {
-        this.role = Roles.getRoles().contains(role.toUpperCase()) ? "ROLE_" + role.toUpperCase() : "ROLE_USER";
+    public void setRole(Roles role) {
+        this.role = role;
     }
 
     @PrePersist
@@ -107,5 +107,10 @@ public abstract class AbstractUser {
     @PreUpdate
     protected void onUpdate(){
         updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString(){
+        return id + " " + username + " " + email;
     }
 }

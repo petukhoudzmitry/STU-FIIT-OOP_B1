@@ -1,12 +1,13 @@
-package com.petition.platform.models;
+package com.petition.platform.roles;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
 public enum Roles {
-    USER ("USER"),
-    ADMIN ("ADMIN"),
-    SUPER ("SUPER");
+    USER ("ROLE_USER"),
+    COMPANY ("ROLE_COMPANY"),
+    ADMIN ("ROLE_ADMIN"),
+    SUPER ("ROLE_SUPER");
 
     private final String name;
 
@@ -29,6 +30,6 @@ public enum Roles {
             }
         }
 
-        return null;
+        return USER;
     }
 }

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>Register User</title>
+    <title>Register Company</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
@@ -99,7 +99,7 @@
 </div>
 
 <main class="form-signin w-100 m-auto">
-    <form th:action="@{/auth/register}" method="post" th:object="${simpleUser}">
+    <form th:action="@{/auth/register/company}" method="post" th:object="${companyUser}">
 
         <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.error}">
             This email is already used.
@@ -126,10 +126,9 @@
         <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
     </form>
     <p>
-        <a href="register/company">Register your company</a>
-    </p>
-    <p>
-        <a href="./login">Login</a>
+        <a href="../register">
+            Register new user
+        </a>
     </p>
 </main>
 <script src="/js/bootstrap.bundle.min.js"></script>

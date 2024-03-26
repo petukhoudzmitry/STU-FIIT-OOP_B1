@@ -1,6 +1,6 @@
 package com.petition.platform.services;
 
-import com.petition.platform.models.SimpleUser;
+import com.petition.platform.models.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,25 +10,25 @@ import java.util.Collections;
 
 public class UserDetailsPrincipal implements UserDetails {
 
-    private final SimpleUser simpleUser;
+    private final User user;
 
-    public UserDetailsPrincipal(SimpleUser simpleUser){
-        this.simpleUser = simpleUser;
+    public UserDetailsPrincipal(User user){
+        this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority(simpleUser.getRole()));
+        return Collections.singleton(new SimpleGrantedAuthority(user.getRole().getName()));
     }
 
     @Override
     public String getPassword() {
-        return simpleUser.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return simpleUser.getUsername();
+        return user.getUsername();
     }
 
     @Override
@@ -48,6 +48,10 @@ public class UserDetailsPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return simpleUser.getEnabled();
+        return user.getEnabled();
+    }
+
+    public Long getId(){
+        return user.getId();
     }
 }

@@ -26,10 +26,12 @@ public class SecurityConfig{
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/auth/register/company").permitAll()
                         .requestMatchers("/auth/logout").authenticated()
                         .requestMatchers("/super/*").hasRole("SUPER")
                         .requestMatchers("/css/*").permitAll()
                         .requestMatchers("/js/*").permitAll()
+                        .requestMatchers("/images/*").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/auth/login").permitAll().defaultSuccessUrl("/"))
                 .logout(logout -> {

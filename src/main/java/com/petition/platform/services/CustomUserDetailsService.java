@@ -1,55 +1,72 @@
 package com.petition.platform.services;
 
 import com.petition.platform.models.*;
-import com.petition.platform.repositories.UserRepository;
+import com.petition.platform.repositories.AdminUserRepository;
+import com.petition.platform.repositories.CompanyUserRepository;
+import com.petition.platform.repositories.SimpleUserRepository;
+import com.petition.platform.repositories.SuperUserRepository;
+import com.petition.platform.roles.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
+    private SimpleUserRepository simpleUserSimpleUserRepository;
+    @Autowired
+    private SuperUserRepository superUserSimpleUserRepository;
+    @Autowired
+    private AdminUserRepository adminUserUserRepository;
+    @Autowired
+    private CompanyUserRepository companyUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return new UserDetailsPrincipal(userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email)));
+        Optional<SimpleUser> simpleUser = simpleUserSimpleUserRepository.findByEmail(email);
+
+        if(simpleUser.isEmpty()){
+            Optional<CompanyUser> companyUser = companyUserRepository.findByEmail(email);
+            if(companyUser.isEmpty()) {
+                Optional<AdminUser> adminUser = adminUserUserRepository.findByEmail(email);
+                if (adminUser.isEmpty()) {
+                    Optional<SuperUser> superUser = superUserSimpleUserRepository.findByEmail(email);
+                    if (superUser.isEmpty()) {
+                        throw new UsernameNotFoundException("Couldn't find user with the email: " + email);
+                    } else {
+                        return new UserDetailsPrincipal(superUser.get());
+                    }
+                } else {
+                    return new UserDetailsPrincipal(adminUser.get());
+                }
+            }else{
+                return new UserDetailsPrincipal(companyUser.get());
+            }
+        }
+
+        return new UserDetailsPrincipal(simpleUser.get());
     }
 
-    public boolean addUser(SimpleUser simpleUser) throws NullPointerException {
-        final String role = simpleUser.getRole();
-        System.out.println(role.equals(Roles.USER.getName()));
-        Roles roles = Roles.getRole(role.toUpperCase());
-        assert roles != null;
-        return switch(roles){
-            case Roles.USER -> addSimpleUser(simpleUser);
-            case Roles.ADMIN -> addAdminUser(simpleUser);
-            case Roles.SUPER -> addSuperUser(simpleUser);
+    public boolean addUser(User user) throws NullPointerException {
+        final Roles role = user.getRole();
+        return switch(role){
+            case Roles.USER -> addSimpleUser(user);
+            case Roles.COMPANY -> addCompanyUser(user);
+            case Roles.ADMIN -> addAdminUser(user);
+            case Roles.SUPER -> addSuperUser(user);
         };
     }
 
-    public boolean addSimpleUser(SimpleUser simpleUser) throws NullPointerException {
-
-        if(userRepository.findByEmail((simpleUser.getEmail())).isEmpty()){
-            setupDefaultUser(simpleUser);
-            userRepository.save(simpleUser);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean addAdminUser(SimpleUser simpleUser) throws NullPointerException {
-
-        if(userRepository.findByEmail(simpleUser.getEmail()).isEmpty()){
-            setupDefaultUser(simpleUser);
-            simpleUser.setRole("admin");
-            userRepository.save(simpleUser);
+    public boolean addCompanyUser(User user) throws NullPointerException {
+        if(companyUserRepository.findByEmail((user.getEmail())).isEmpty()){
+            setupDefaultUser(user);
+            user.setRole(Roles.COMPANY);
+            companyUserRepository.save((CompanyUser) user);
 
             return true;
         }
@@ -57,11 +74,23 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
-    public boolean addSuperUser(SimpleUser simpleUser) throws NullPointerException {
-        if(userRepository.findByEmail(simpleUser.getEmail()).isEmpty()) {
-            setupDefaultUser(simpleUser);
-            simpleUser.setRole("super");
-            userRepository.save(simpleUser);
+    public boolean addSimpleUser(User user) throws NullPointerException {
+
+        if(simpleUserSimpleUserRepository.findByEmail((user.getEmail())).isEmpty()){
+            setupDefaultUser(user);
+            simpleUserSimpleUserRepository.save((SimpleUser) user);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean addAdminUser(User user) throws NullPointerException {
+
+        if(adminUserUserRepository.findByEmail(user.getEmail()).isEmpty()){
+            setupDefaultUser(user);
+            user.setRole(Roles.ADMIN);
+            adminUserUserRepository.save((AdminUser) user);
 
             return true;
         }
@@ -69,8 +98,20 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
-    private void setupDefaultUser(SimpleUser simpleUser) throws NullPointerException {
-        simpleUser.setRole("user");
-        simpleUser.setEnabled(true);
+    public boolean addSuperUser(User user) throws NullPointerException {
+        if(superUserSimpleUserRepository.findByEmail(user.getEmail()).isEmpty()) {
+            setupDefaultUser(user);
+            user.setRole(Roles.SUPER);
+            superUserSimpleUserRepository.save((SuperUser) user);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void setupDefaultUser(User user) throws NullPointerException {
+        user.setRole(Roles.USER);
+        user.setEnabled(true);
     }
 }
