@@ -19,7 +19,7 @@ public class SuperController {
 
     @GetMapping("/add")
     public String addUser(Model model){
-        model.addAttribute(new SimpleUser());
+        model.addAttribute(new User());
         return "super-add";
     }
 

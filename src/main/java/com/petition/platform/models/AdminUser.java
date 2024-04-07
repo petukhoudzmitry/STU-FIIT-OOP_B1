@@ -4,4 +4,9 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class AdminUser extends User {
+    public AdminUser(){}
+
+    public AdminUser(User user){
+        super(user);
+    }
 }

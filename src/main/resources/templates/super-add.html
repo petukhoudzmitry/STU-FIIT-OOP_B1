@@ -10,45 +10,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        @media (min-width: 768px) {
-        }
-
-        .bi {
-            vertical-align: -.125em;
-            fill: currentColor;
-        }
-
-        .btn-bd-primary {
-            --bd-violet-bg: #712cf9;
-            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
-
-            --bs-btn-font-weight: 600;
-            --bs-btn-color: var(--bs-white);
-            --bs-btn-bg: var(--bd-violet-bg);
-            --bs-btn-border-color: var(--bd-violet-bg);
-            --bs-btn-hover-color: var(--bs-white);
-            --bs-btn-hover-bg: #6528e0;
-            --bs-btn-hover-border-color: #6528e0;
-            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
-            --bs-btn-active-color: var(--bs-btn-hover-color);
-            --bs-btn-active-bg: #5a23c8;
-            --bs-btn-active-border-color: #5a23c8;
-        }
-
-        .bd-mode-toggle {
-            z-index: 1500;
-        }
-
-        .bd-mode-toggle .dropdown-menu .active .bi {
-            display: block !important;
-        }
-    </style>
+    <link href="/css/home-common.css" rel="stylesheet">
     <link href="/css/sign-in.css" rel="stylesheet">
+    <!-- Favicons -->
+    <link rel="icon" href="/images/favicon.ico">
+    <link rel="icon" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="icon" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 </head>
 
 <body class="d-flex align-items-center py-4 bg-body-tertiary">
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+    <symbol id="arrow-left-short" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
+    </symbol>
     <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
     </symbol>
@@ -91,28 +66,33 @@
         </li>
         <li>
             <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
-                <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#circle-half"></use></svg>
-                Auto
-                <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+                <path d="M17.5 12L6.5 12M6.5 12L11.0882 16M6.5 12L11.0882 8" stroke="#363853" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
             </button>
         </li>
     </ul>
 </div>
 
+<div class="accordion-button position-fixed start-0 ms-3 top-0 fixed-top mt-3">
+    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button" onClick="location.replace('/home')">
+        Home
+        <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-left-short"></use></svg>
+    </button>
+</div>
 
 <main class="form-signin w-100 m-auto">
-    <form th:action="@{/super/add}" method="post" th:object="${simpleUser}">
+    <form th:action="@{/super/add}" method="post" th:object="${user}">
 
-        <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.failure}">This simpleUser already exists</h2>
-        <h2 class="h3 mb-3 fw-normal" style="color: #0d6efd" th:if="${param.success}">New simpleUser was added</h2>
+        <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.failure}">This user already exists</h2>
+        <h2 class="h3 mb-3 fw-normal" style="color: #0d6efd" th:if="${param.success}">New user was added</h2>
 
         <h1 class="h3 mb-3 fw-normal">Add User</h1>
 
         <div class="form-floating">
             <select id="floatingSelect" class="form-select" th:field="*{role}" autocomplete="off">
-                <option value="simpleUser">User</option>
-                <option value="admin">Admin</option>
-                <option value="Super">Super</option>
+                <option th:value="${T(com.petition.platform.roles.Roles).USER}">User</option>
+                <option th:value="${T(com.petition.platform.roles.Roles).COMPANY}">Company</option>
+                <option th:value="${T(com.petition.platform.roles.Roles).ADMIN}">Admin</option>
+                <option th:value="${T(com.petition.platform.roles.Roles).SUPER}">Super</option>
             </select>
             <label for="floatingSelect">Role:</label>
         </div>
@@ -132,7 +112,7 @@
             <label for="floatingPassword">Password</label>
         </div>
 
-        <button class="btn btn-primary w-100 py-2" type="submit">Add</button>
+        <button class="btn btn-danger w-100 py-2" type="submit">Add</button>
     </form>
 </main>
 <script src="/js/bootstrap.bundle.min.js"></script>

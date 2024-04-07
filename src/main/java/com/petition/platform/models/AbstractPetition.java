@@ -19,19 +19,22 @@ public class AbstractPetition {
     @Column(name = "text", nullable = false, length = 500)
     protected String text;
 
-
-    @ManyToOne
-    @JoinColumn(name = "creator", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "creator_id", nullable = false)
     protected SimpleUser creator;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id", nullable = false)
+    protected CompanyUser company;
+
     @Column(name = "created_at", nullable = false)
-    protected LocalDateTime created_at;
+    protected LocalDateTime createdAt;
 
     @Column(name = "valid_until", nullable = false)
-    protected LocalDateTime valid_until;
+    protected LocalDateTime validUntil;
 
     @Column(name = "is_valid", nullable = false)
-    protected Boolean is_valid;
+    protected Boolean isValid;
 
     public UUID getId() {
         return id;
@@ -65,33 +68,46 @@ public class AbstractPetition {
         this.creator = creator;
     }
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(LocalDateTime created_at) {
+        this.createdAt = created_at;
     }
 
-    public LocalDateTime getValid_until() {
-        return valid_until;
+    public LocalDateTime getValidUntil() {
+        return validUntil;
     }
 
-    public void setValid_until(LocalDateTime valid_until) {
-        this.valid_until = valid_until;
+    public void setValidUntil(LocalDateTime valid_until) {
+        this.validUntil = valid_until;
     }
 
-    public Boolean getIs_valid() {
-        return is_valid;
+    public Boolean getIsValid() {
+        return isValid;
     }
 
-    public void setIs_valid(Boolean is_valid) {
-        this.is_valid = is_valid;
+    public void setIsValid(Boolean is_valid) {
+        this.isValid = is_valid;
     }
 
     @PrePersist
     protected void onCreate(){
-        created_at = LocalDateTime.now();
-        valid_until = created_at.plusDays(30L);
+        createdAt = LocalDateTime.now();
+        validUntil = createdAt.plusDays(30L);
+    }
+
+    public CompanyUser getCompany() {
+        return company;
+    }
+
+    public void setCompany(CompanyUser company) {
+        this.company = company;
+    }
+
+    @Override
+    public String toString() {
+        return id + " " + title + " " + text + " " + creator + " " + company + " " + createdAt + " " + validUntil;
     }
 }

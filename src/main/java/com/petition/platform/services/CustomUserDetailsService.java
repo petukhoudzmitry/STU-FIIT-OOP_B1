@@ -20,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private SimpleUserRepository simpleUserSimpleUserRepository;
     @Autowired
-    private SuperUserRepository superUserSimpleUserRepository;
+    private SuperUserRepository superUserRepository;
     @Autowired
     private AdminUserRepository adminUserUserRepository;
     @Autowired
@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             if(companyUser.isEmpty()) {
                 Optional<AdminUser> adminUser = adminUserUserRepository.findByEmail(email);
                 if (adminUser.isEmpty()) {
-                    Optional<SuperUser> superUser = superUserSimpleUserRepository.findByEmail(email);
+                    Optional<SuperUser> superUser = superUserRepository.findByEmail(email);
                     if (superUser.isEmpty()) {
                         throw new UsernameNotFoundException("Couldn't find user with the email: " + email);
                     } else {
@@ -53,8 +53,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public boolean addUser(User user) throws NullPointerException {
-        final Roles role = user.getRole();
-        return switch(role){
+        return switch(user.getRole()){
             case Roles.USER -> addSimpleUser(user);
             case Roles.COMPANY -> addCompanyUser(user);
             case Roles.ADMIN -> addAdminUser(user);
@@ -66,7 +65,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if(companyUserRepository.findByEmail((user.getEmail())).isEmpty()){
             setupDefaultUser(user);
             user.setRole(Roles.COMPANY);
-            companyUserRepository.save((CompanyUser) user);
+            companyUserRepository.save(new CompanyUser(user));
 
             return true;
         }
@@ -78,7 +77,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         if(simpleUserSimpleUserRepository.findByEmail((user.getEmail())).isEmpty()){
             setupDefaultUser(user);
-            simpleUserSimpleUserRepository.save((SimpleUser) user);
+            simpleUserSimpleUserRepository.save(new SimpleUser(user));
             return true;
         }
 
@@ -86,11 +85,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public boolean addAdminUser(User user) throws NullPointerException {
-
         if(adminUserUserRepository.findByEmail(user.getEmail()).isEmpty()){
             setupDefaultUser(user);
             user.setRole(Roles.ADMIN);
-            adminUserUserRepository.save((AdminUser) user);
+            adminUserUserRepository.save(new AdminUser(user));
 
             return true;
         }
@@ -99,11 +97,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public boolean addSuperUser(User user) throws NullPointerException {
-        if(superUserSimpleUserRepository.findByEmail(user.getEmail()).isEmpty()) {
+        if(superUserRepository.findByEmail(user.getEmail()).isEmpty()) {
             setupDefaultUser(user);
             user.setRole(Roles.SUPER);
-            superUserSimpleUserRepository.save((SuperUser) user);
-
+            superUserRepository.save(new SuperUser(user));
             return true;
         }
 

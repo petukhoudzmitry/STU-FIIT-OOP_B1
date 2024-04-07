@@ -6,14 +6,21 @@ import java.util.List;
 
 @Entity
 public class SimpleUser extends User {
-    @OneToMany(mappedBy = "creator")
-    protected List<SimplePetition> signed_simple_petitions;
 
-    public List<SimplePetition> getSigned_simple_petitions() {
-        return signed_simple_petitions;
+    public SimpleUser(){}
+
+    public SimpleUser(User user){
+        super(user);
     }
 
-    public void setSigned_simple_petitions(List<SimplePetition> signed_simple_petitions) {
-        this.signed_simple_petitions = signed_simple_petitions;
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    protected List<SimplePetition> petitions;
+
+    public List<SimplePetition> getPetitions() {
+        return petitions;
+    }
+
+    public void setPetitions(List<SimplePetition> petitions) {
+        this.petitions = petitions;
     }
 }

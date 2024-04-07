@@ -5,9 +5,23 @@ import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @MappedSuperclass
-public abstract class User {
+public class User {
+
+    public User() {}
+
+    public User(User user){
+        this.id = user.id;
+        this.username = user.username;
+        this.email = user.email;
+        this.password = user.password;
+        this.enabled = user.enabled;
+        this.createdAt = user.createdAt;
+        this.updatedAt = user.updatedAt;
+        this.role = user.role;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +60,7 @@ public abstract class User {
     public String getEmail() {
         return email;
     }
+
     public String getPassword() {
         return password;
     }

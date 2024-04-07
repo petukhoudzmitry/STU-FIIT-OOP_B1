@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
 <head><script src="/js/color-modes.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
-    <title>Register Company</title>
+    <title>Add Petition</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sign-in/">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/home-common.css">
-    <link href="/css/sign-in.css" rel="stylesheet">
 
+    <link href="/css/home-common.css" rel="stylesheet">
+    <link href="/css/sign-in.css" rel="stylesheet">
     <!-- Favicons -->
     <link rel="icon" href="/images/favicon.ico">
     <link rel="icon" sizes="16x16" href="/images/favicon-16x16.png">
@@ -21,6 +21,9 @@
 
 <body class="d-flex align-items-center py-4 bg-body-tertiary">
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+    <symbol id="arrow-left-short" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5"/>
+    </symbol>
     <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
     </symbol>
@@ -35,6 +38,7 @@
         <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
     </symbol>
 </svg>
+
 <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
     <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
             id="bd-theme"
@@ -62,47 +66,48 @@
         </li>
         <li>
             <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
-                <svg class="bi me-2 opacity-50" width="1em" height="1em"><use href="#circle-half"></use></svg>
-                Auto
-                <svg class="bi ms-auto d-none" width="1em" height="1em"><use href="#check2"></use></svg>
+                <path d="M17.5 12L6.5 12M6.5 12L11.0882 16M6.5 12L11.0882 8" stroke="#363853" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
             </button>
         </li>
     </ul>
 </div>
 
+<div class="accordion-button position-fixed start-0 ms-3 top-0 fixed-top mt-3">
+    <button class="btn btn-outline-secondary d-inline-flex align-items-center" type="button" onClick="location.replace('/home')">
+        Home
+        <svg class="bi ms-1" width="20" height="20"><use xlink:href="#arrow-left-short"></use></svg>
+    </button>
+</div>
+
 <main class="form-signin w-100 m-auto">
-    <form th:action="@{/auth/register/company}" method="post" th:object="${companyUser}">
+    <form th:action="@{/petition/add}" method="post" th:object="${simplePetition}">
 
-        <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.error}">
-            This email is already used.
-            <a href="/auth/login/" style="color: #0d6efd">Log in</a>
-        </h2>
+        <h2 class="h3 mb-3 fw-normal" style="color: #dc3545" th:if="${param.failure}">You already have an active petition for this company</h2>
+        <h2 class="h3 mb-3 fw-normal" style="color: #0d6efd" th:if="${param.success}">New petition was successfully added</h2>
 
-        <h1 class="h3 mb-3 fw-normal">Register</h1>
+        <h1 class="h3 mb-3 fw-normal">Add Petition</h1>
 
         <div class="form-floating">
-            <input type="text" class="form-control" id="username" placeholder="Username" autocomplete="off" required th:field="*{username}">
-            <label for="username">Username</label>
+            <select id="floatingSelect" class="form-select" name="companyId" autocomplete="off">
+                <option th:each="company : ${companies}" th:value="${company.id}" th:text="${company.getUsername()}"></option>
+            </select>
+            <label for="floatingSelect">Company:</label>
         </div>
 
         <div class="form-floating">
-            <input type="email" class="form-control" id="email" placeholder="name@example.com" autocomplete="off" required th:field="*{email}">
-            <label for="email">Email address</label>
+            <input id="floatingText" type="text" placeholder="Username" class="form-control" th:field="*{title}" autocomplete="off" required>
+            <label for="floatingText">Title:</label>
         </div>
 
         <div class="form-floating">
-            <input type="password" class="form-control" id="password" placeholder="Password" autocomplete="off" required th:field="*{password}">
-            <label for="password">Password</label>
+            <textarea class="form-control" id="floatingInput" rows="7" th:field="*{text}" autocomplete="off" required></textarea>
+            <label for="floatingInput">Text</label>
         </div>
 
-        <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+        <button class="btn btn-danger w-100 py-2" type="submit">Add</button>
     </form>
-    <p>
-        <a href="../register">
-            Register new user
-        </a>
-    </p>
 </main>
 <script src="/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
