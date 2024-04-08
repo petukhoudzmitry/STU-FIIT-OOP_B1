@@ -13,8 +13,10 @@ import java.util.UUID;
 @Repository
 public interface SimplePetitionRepository extends JpaRepository<SimplePetition, Long> {
     Optional<SimplePetition> findById(UUID id);
-    List<SimplePetition> findByTitle(String title);
+    List<SimplePetition> findByTitleContaining(String title);
     List<SimplePetition> findByCreator(SimpleUser creator);
     List<SimplePetition> findByCompany(CompanyUser company);
     List<SimplePetition> findByCompanyAndCreatorOrderByValidUntilDesc(CompanyUser companyUser, SimpleUser creator);
+    List<SimplePetition> findByTextContaining(String text);
+    List<SimplePetition> findByCompanyUsernameContaining(String name);
 }

@@ -107,15 +107,17 @@
         <hr>
         <div class="dropdown" sec:authorize="isAuthenticated()">
             <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <img sec:authorize="hasRole('ROLE_USER')" src="/images/user_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
-                <img sec:authorize="hasRole('ROLE_ADMIN')" src="/images/admin_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
-                <img sec:authorize="hasRole('ROLE_SUPER')" src="/images/super_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())" src="/images/user_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).COMPANY.getName())" src="/images/company_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName())" src="/images/admin_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())" src="/images/super_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
                 <span sec:authentication="name"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                <li><a class="dropdown-item" href="#">New petition...</a></li>
-                <!--                <li><a class="dropdown-item" href="#">Settings</a></li>-->
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())"><a class="dropdown-item" href="/petition/add">New petition</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName()) or hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="">Manage users</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="/super/add">Add users</a></li>
+                <li><a class="dropdown-item" href="">Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
             </ul>
@@ -125,7 +127,7 @@
     <div class="b-example-divider b-example-vr"></div>
 
     <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center" style="flex: 1">
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex" role="search" method="get" action="/home/users">
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/users">
             <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
         </form>
         <div class="scrollable-container">

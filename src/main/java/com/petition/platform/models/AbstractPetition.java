@@ -1,12 +1,14 @@
 package com.petition.platform.models;
 
 import jakarta.persistence.*;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @MappedSuperclass
-public class AbstractPetition {
+public class AbstractPetition implements Comparable<AbstractPetition>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,6 +28,9 @@ public class AbstractPetition {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id", nullable = false)
     protected CompanyUser company;
+
+    @ManyToMany(mappedBy = "signedPetitions", fetch = FetchType.EAGER)
+    protected List<SimpleUser> voters;
 
     @Column(name = "created_at", nullable = false)
     protected LocalDateTime createdAt;
@@ -106,8 +111,39 @@ public class AbstractPetition {
         this.company = company;
     }
 
+    public List<SimpleUser> getVoters() {
+        return voters;
+    }
+
+    public void setVoters(List<SimpleUser> voters) {
+        this.voters = voters;
+    }
+
+    public Boolean getValid() {
+        return isValid;
+    }
+
+    public void setValid(Boolean valid) {
+        isValid = valid;
+    }
+
     @Override
     public String toString() {
         return id + " " + title + " " + text + " " + creator + " " + company + " " + createdAt + " " + validUntil;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof AbstractPetition){
+            return ((AbstractPetition) obj).id.equals(this.id);
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public int compareTo(AbstractPetition o) {
+        return o == null ? -1 : this.id.compareTo(o.id);
     }
 }

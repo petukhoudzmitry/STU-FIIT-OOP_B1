@@ -12,6 +12,7 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/home-common.css">
     <link href="/css/sidebars.css" rel="stylesheet">
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/album/">
 
     <!-- Favicons -->
     <link rel="icon" href="/images/favicon.ico">
@@ -104,15 +105,17 @@
         <hr>
         <div class="dropdown" sec:authorize="isAuthenticated()">
             <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <img sec:authorize="hasRole('ROLE_USER')" src="/images/user_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
-                <img sec:authorize="hasRole('ROLE_ADMIN')" src="/images/admin_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
-                <img sec:authorize="hasRole('ROLE_SUPER')" src="/images/super_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())" src="/images/user_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).COMPANY.getName())" src="/images/company_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName())" src="/images/admin_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
+                <img sec:authorize="hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())" src="/images/super_avatar.svg" alt="" width="32" height="32" class="rounded-circle me-2">
                 <span sec:authentication="name"></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                <li><a class="dropdown-item" href="#">New petition...</a></li>
-                <!--                <li><a class="dropdown-item" href="#">Settings</a></li>-->
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())"><a class="dropdown-item" href="/petition/add">New petition</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName()) or hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="">Manage users</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="/super/add">Add users</a></li>
+                <li><a class="dropdown-item" href="">Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
             </ul>
@@ -121,6 +124,39 @@
 
     <div class="b-example-divider b-example-vr"></div>
 
+    <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center" style="flex: 1">
+
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/petitions">
+            <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
+        </form>
+
+        <div class="album py-5 d-flex flex-grow-1 overflow-auto">
+            <div class="container">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    <div th:each="petition : ${petitions}" class="col">
+                        <div class="card shadow-sm">
+                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text></svg>
+                            <div class="card-body">
+                                <p class="card-text" th:text="${petition.text}"></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())">
+                                            <form method="post" role="form" action="/home/petitions/vote">
+                                                <button type="submit" name="id" th:value="${petition.id}" class="btn btn-success" th:if="${!signedPetitions.contains(petition)}">Vote</button>
+                                            </form>
+                                            <form method="post" role="form" action="/home/petitions/retract">
+                                                <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger" th:if="${signedPetitions.contains(petition)}">Retract vote</button>
+                                            </form>
+                                        </div>
+                                    <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </main>
 <script src="/js/bootstrap.bundle.min.js"></script>
 

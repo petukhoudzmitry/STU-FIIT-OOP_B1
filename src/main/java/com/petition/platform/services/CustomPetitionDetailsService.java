@@ -22,7 +22,7 @@ public class CustomPetitionDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new PetitionDetailsPrincipal(simplePetitionRepository.findByTitle(username).getFirst());
+        return new PetitionDetailsPrincipal(simplePetitionRepository.findByTitleContaining(username).getFirst());
     }
 
     public boolean addPetition(SimplePetition simplePetition, Long id) {
@@ -34,8 +34,7 @@ public class CustomPetitionDetailsService implements UserDetailsService {
                         simplePetition.getCreator()
                 )
                 .getFirst()
-                .getValidUntil()
-                .compareTo(LocalDateTime.now()) > 0){
+                .getValidUntil().isAfter(LocalDateTime.now())){
             return false;
         }
 
