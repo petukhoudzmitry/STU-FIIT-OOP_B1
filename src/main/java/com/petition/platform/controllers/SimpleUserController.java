@@ -1,11 +1,9 @@
 package com.petition.platform.controllers;
 
-import com.petition.platform.models.AbstractPetition;
-import com.petition.platform.models.SimplePetition;
-import com.petition.platform.models.SimpleUser;
-import com.petition.platform.models.User;
+import com.petition.platform.models.*;
 import com.petition.platform.repositories.*;
 import com.petition.platform.roles.Roles;
+import com.petition.platform.services.CustomUserDetailsService;
 import com.petition.platform.services.UserDetailsPrincipal;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,9 @@ public class SimpleUserController {
     private SimplePetitionRepository simplePetitionRepository;
 
     @GetMapping("")
-    public String home() {
+    public String home(Model model) {
+        SimpleUser user = simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).get();
+        model.addAttribute("petitions", (user).getSignedPetitions());
         return "home";
     }
 
@@ -41,6 +41,32 @@ public class SimpleUserController {
     public String companies(@RequestParam(name="search", defaultValue = "") String search, Model model) {
         model.addAttribute("companies", companyUserRepository.findByUsernameContaining(search));
         return "home-companies";
+    }
+
+    @PostMapping("/retract")
+    public String home(@RequestParam(name = "id")UUID id, Model model){
+        UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Roles role = userDetailsPrincipal.getRole();
+
+        switch(role){
+            case Roles.USER -> {
+                SimpleUser user = simpleUserRepository.findById(userDetailsPrincipal.getId()).get();
+                (user).getSignedPetitions().removeIf(e -> e.equals(simplePetitionRepository.findById(id).get()));
+                simpleUserRepository.save(user);
+                model.addAttribute("petitions", (user).getSignedPetitions());
+            }
+            case Roles.COMPANY -> {
+                CompanyUser user = companyUserRepository.findById(userDetailsPrincipal.getId()).get();
+            }
+            case Roles.ADMIN -> {
+                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
+            }
+            case Roles.SUPER -> {
+                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
+            }
+        }
+
+        return "home";
     }
 
     @GetMapping("/petitions")

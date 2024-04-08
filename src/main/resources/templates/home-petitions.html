@@ -135,7 +135,12 @@
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                     <div th:each="petition : ${petitions}" class="col">
                         <div class="card shadow-sm">
-                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text></svg>
+                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                                <title>Placeholder</title>
+                                <rect width="100%" height="100%" fill="#55595c"></rect>
+                                <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text>
+                            </svg>
+                            <small class="text-body-secondary mt-1 ms-1" th:text="'To: ' + ${petition.company.username}"></small>
                             <div class="card-body">
                                 <p class="card-text" th:text="${petition.text}"></p>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -148,6 +153,7 @@
                                             </form>
                                         </div>
                                     <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
+                                    <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
                                 </div>
                             </div>
                         </div>

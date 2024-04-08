@@ -32,6 +32,8 @@ public class SecurityConfig{
                         .requestMatchers("/css/*").permitAll()
                         .requestMatchers("/js/*").permitAll()
                         .requestMatchers("/images/*").permitAll()
+                        .requestMatchers("/petition/*").hasRole("USER")
+                        .requestMatchers("/home/retract").hasRole("USER")
                         .anyRequest().authenticated())
                 .formLogin(login -> login.loginPage("/auth/login").permitAll().defaultSuccessUrl("/"))
                 .logout(logout -> {
