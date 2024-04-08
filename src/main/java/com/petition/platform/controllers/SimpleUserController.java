@@ -32,9 +32,28 @@ public class SimpleUserController {
 
     @GetMapping("")
     public String home(Model model) {
-        SimpleUser user = simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).get();
-        model.addAttribute("petitions", (user).getSignedPetitions());
+        UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Roles role = userDetailsPrincipal.getRole();
+
+        switch(role){
+            case Roles.USER -> {
+                SimpleUser user = simpleUserRepository.findById(userDetailsPrincipal.getId()).get();
+                model.addAttribute("petitions", user.getSignedPetitions());
+                model.addAttribute("createdPetitions", user.getPetitions());}
+            case Roles.COMPANY -> {
+                CompanyUser user = companyUserRepository.findById(userDetailsPrincipal.getId()).get();
+                model.addAttribute("petitions", user.getPetitions());
+            }
+            case Roles.ADMIN -> {
+                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
+            }
+            case Roles.SUPER -> {
+                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
+            }
+        }
+
         return "home";
+
     }
 
     @GetMapping("/companies")
@@ -44,26 +63,13 @@ public class SimpleUserController {
     }
 
     @PostMapping("/retract")
-    public String home(@RequestParam(name = "id")UUID id, Model model){
+    public String home(@RequestParam(name = "id")UUID id){
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Roles role = userDetailsPrincipal.getRole();
 
-        switch(role){
-            case Roles.USER -> {
-                SimpleUser user = simpleUserRepository.findById(userDetailsPrincipal.getId()).get();
-                (user).getSignedPetitions().removeIf(e -> e.equals(simplePetitionRepository.findById(id).get()));
-                simpleUserRepository.save(user);
-                model.addAttribute("petitions", (user).getSignedPetitions());
-            }
-            case Roles.COMPANY -> {
-                CompanyUser user = companyUserRepository.findById(userDetailsPrincipal.getId()).get();
-            }
-            case Roles.ADMIN -> {
-                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
-            }
-            case Roles.SUPER -> {
-                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
-            }
+        if (userDetailsPrincipal.getRole() == Roles.USER) {
+            SimpleUser user = simpleUserRepository.findById(userDetailsPrincipal.getId()).get();
+            user.getSignedPetitions().removeIf(e -> e.equals(simplePetitionRepository.findById(id).get()));
+            simpleUserRepository.save(user);
         }
 
         return "home";
