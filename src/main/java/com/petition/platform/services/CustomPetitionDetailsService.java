@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomPetitionDetailsService implements UserDetailsService {
@@ -28,13 +30,12 @@ public class CustomPetitionDetailsService implements UserDetailsService {
     public boolean addPetition(SimplePetition simplePetition, Long id) {
         CompanyUser companyUser = companyUserRepository.findById(id).get();
 
-        if(simplePetitionRepository
-                .findByCompanyAndCreatorOrderByValidUntilDesc(
-                        companyUser,
-                        simplePetition.getCreator()
-                )
-                .getFirst()
-                .getValidUntil().isAfter(LocalDateTime.now())){
+        List<SimplePetition> optional = simplePetitionRepository.findByCompanyAndCreatorOrderByValidUntilDesc(
+                companyUser,
+                simplePetition.getCreator()
+        );
+
+        if(!optional.isEmpty() && optional.getFirst().getValidUntil().isAfter(LocalDateTime.now())){
             return false;
         }
 
