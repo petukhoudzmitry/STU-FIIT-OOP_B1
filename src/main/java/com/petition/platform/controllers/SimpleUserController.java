@@ -72,7 +72,7 @@ public class SimpleUserController {
             simpleUserRepository.save(user);
         }
 
-        return "home";
+        return "redirect:/home";
     }
 
     @GetMapping("/petitions")
