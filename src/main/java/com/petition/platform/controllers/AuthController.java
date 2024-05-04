@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/auth")
@@ -30,7 +31,7 @@ public class AuthController {
     }
 
     @GetMapping("/register/company")
-    public String registerCompany(Model model){
+    public String registerCompany(@RequestParam(name="", defaultValue="") Model model){
         if(isAuthenticated()){
             return "redirect:/home";
         }
@@ -40,18 +41,14 @@ public class AuthController {
 
     @PostMapping("/register/company")
     public String register(CompanyUser companyUser){
-        if(isAuthenticated()){
-            return "redirect:/home";
-        }
-        return userDetailsService.addCompanyUser(companyUser) ? "redirect:/auth/login" : "redirect:/auth/register?error";
+        return isAuthenticated() ? "redirect:/home" :
+                userDetailsService.addCompanyUser(companyUser) ? "redirect:/auth/login" : "redirect:/auth/register?error";
     }
 
     @PostMapping("/register")
     public String register(SimpleUser simpleUser){
-        if(isAuthenticated()){
-            return "redirect:/home";
-        }
-        return userDetailsService.addSimpleUser(simpleUser) ? "redirect:/auth/login" : "redirect:/auth/register?error";
+        return isAuthenticated() ? "redirect:/home" :
+                userDetailsService.addSimpleUser(simpleUser) ? "redirect:/auth/login" : "redirect:/auth/register?error";
     }
 
     @GetMapping("/login")

@@ -7,6 +7,7 @@ import com.petition.platform.repositories.SimpleUserRepository;
 import com.petition.platform.repositories.SuperUserRepository;
 import com.petition.platform.roles.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -98,9 +99,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     public boolean addSuperUser(User user) throws NullPointerException {
         if(superUserRepository.findByEmail(user.getEmail()).isEmpty()) {
-            setupDefaultUser(user);
-            user.setRole(Roles.SUPER);
-            superUserRepository.save(new SuperUser(user));
+            SuperUser superUser = new SuperUser(user);
+            if(superUserRepository.count() == 1L && superUserRepository.findById(1L).isPresent()){
+                superUser.setRoot(true);
+                SuperUser superUser1 = superUserRepository.findById(1L).get();
+                superUser1.setRoot(false);
+                superUserRepository.save(superUser1);
+            }
+            setupDefaultUser(superUser);
+            superUser.setRole(Roles.SUPER);
+            superUserRepository.save(superUser);
             return true;
         }
 

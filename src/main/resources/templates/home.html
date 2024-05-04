@@ -112,8 +112,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                 <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())"><a class="dropdown-item" href="/petition/add">New petition</a></li>
-                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName()) or hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="">Manage users</a></li>
-                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="/super/add">Add users</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName()) or hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="/admin">Manage users</a></li>
                 <li><a class="dropdown-item" href="">Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
@@ -141,7 +140,7 @@
                             <div class="card-body">
                                 <p class="card-text" th:text="${petition.text}"></p>
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())">
+                                    <div class="btn-group" th:if="${petition.validUntil.isAfter(T(java.time.LocalDateTime).now())}" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())">
                                         <form method="post" role="form" action="/home/retract">
                                             <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger">Retract vote</button>
                                         </form>

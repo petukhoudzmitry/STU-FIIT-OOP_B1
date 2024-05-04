@@ -45,10 +45,10 @@ public class SimpleUserController {
                 model.addAttribute("petitions", user.getPetitions());
             }
             case Roles.ADMIN -> {
-                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
+//                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
             }
             case Roles.SUPER -> {
-                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
+//                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
             }
         }
 
