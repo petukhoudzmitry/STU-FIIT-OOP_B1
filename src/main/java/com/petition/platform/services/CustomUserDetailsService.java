@@ -29,28 +29,24 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<SimpleUser> simpleUser = simpleUserSimpleUserRepository.findByEmail(email);
 
-        if(simpleUser.isEmpty()){
-            Optional<CompanyUser> companyUser = companyUserRepository.findByEmail(email);
-            if(companyUser.isEmpty()) {
-                Optional<AdminUser> adminUser = adminUserUserRepository.findByEmail(email);
-                if (adminUser.isEmpty()) {
-                    Optional<SuperUser> superUser = superUserRepository.findByEmail(email);
-                    if (superUser.isEmpty()) {
-                        throw new UsernameNotFoundException("Couldn't find user with the email: " + email);
-                    } else {
-                        return new UserDetailsPrincipal(superUser.get());
-                    }
-                } else {
-                    return new UserDetailsPrincipal(adminUser.get());
-                }
-            }else{
-                return new UserDetailsPrincipal(companyUser.get());
-            }
-        }
+        final UserDetailsPrincipal[] userDetailsPrincipal = new UserDetailsPrincipal[1];
 
-        return new UserDetailsPrincipal(simpleUser.get());
+        simpleUserSimpleUserRepository.findByEmail(email).ifPresentOrElse(
+                user -> userDetailsPrincipal[0] =  new UserDetailsPrincipal(user),
+                () -> companyUserRepository.findByEmail(email).ifPresentOrElse(
+                        user -> userDetailsPrincipal[0] = new UserDetailsPrincipal(user),
+                        () -> adminUserUserRepository.findByEmail(email).ifPresentOrElse(
+                                user -> userDetailsPrincipal[0] = new UserDetailsPrincipal(user),
+                                () -> superUserRepository.findByEmail(email).ifPresentOrElse(
+                                        user -> userDetailsPrincipal[0] = new UserDetailsPrincipal(user),
+                                        () -> {throw new UsernameNotFoundException("Couldn't find user with the email: " + email);}
+                                )
+                        )
+                )
+        );
+
+        return userDetailsPrincipal[0];
     }
 
     public boolean addUser(User user) throws NullPointerException {

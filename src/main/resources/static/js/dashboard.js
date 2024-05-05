@@ -1,11 +1,8 @@
-/* globals Chart:false */
-
 (() => {
   'use strict'
 
-  // Graphs
   const ctx = document.getElementById('myChart')
-  // eslint-disable-next-line no-unused-vars
+
   const myChart = new Chart(ctx, {
     type: 'bar',
     data: {

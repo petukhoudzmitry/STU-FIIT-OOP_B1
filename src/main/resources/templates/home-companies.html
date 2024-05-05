@@ -113,7 +113,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                 <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())"><a class="dropdown-item" href="/petition/add">New petition</a></li>
-                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName()) or hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="/admin">Manage users</a></li>
+                <li sec:authorize="hasRole(T(com.petition.platform.roles.Roles).ADMIN.getName()) or hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())"><a class="dropdown-item" href="/admin">Dashboard</a></li>
                 <li><a class="dropdown-item" href="">Profile</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="/auth/logout">Sign out</a></li>
@@ -131,7 +131,7 @@
 
             <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center overflow-auto" style="margin: auto; flex: 0.4;">
 
-                <div th:if="${companies.empty}">
+                <div th:if="${companies.isEmpty()}">
                     <h1>There are no users yet...</h1>
                 </div>
 

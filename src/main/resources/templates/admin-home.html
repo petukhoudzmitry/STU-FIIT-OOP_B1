@@ -188,8 +188,13 @@
               </a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.getName(), T(com.petition.platform.roles.Roles).SUPER.getName())">
-              <a class="nav-link d-flex align-items-center gap-2" href="">
+              <a class="nav-link d-flex align-items-center gap-2" href="/admin/block/users">
                 Block Users
+              </a>
+            </li>
+            <li class="nav-item" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.getName(), T(com.petition.platform.roles.Roles).SUPER.getName())">
+              <a class="nav-link d-flex align-items-center gap-2" href="">
+                Block Petitions
               </a>
             </li>
             <li class="nav-item" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).SUPER.getName())">
@@ -245,6 +250,7 @@
           </tbody>
         </table>
       </div>
+
     </main>
   </div>
 </div>
