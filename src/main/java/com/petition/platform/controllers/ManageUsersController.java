@@ -41,7 +41,6 @@ public class ManageUsersController {
 
     @GetMapping("")
     public String adminHome(Model model){
-
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Roles role = userDetailsPrincipal.getRole();
 
@@ -70,12 +69,7 @@ public class ManageUsersController {
             usersToBlock.clear();
         }
 
-        if(petitionsToBlock.isEmpty()){
-            model.addAttribute("petitions", simplePetitionRepository.findAll());
-        }else{
-            model.addAttribute("petitions", new ArrayList<>(petitionsToBlock));
-            petitionsToBlock.clear();
-        }
+        model.addAttribute("petitions", petitionsToBlock.isEmpty() ? simplePetitionRepository.findAll() : new ArrayList<>(petitionsToBlock));
 
         return "admin-home";
     }
@@ -92,7 +86,7 @@ public class ManageUsersController {
     }
 
     @GetMapping("/block/users")
-    public String blockUser(@RequestParam(name = "search", defaultValue = "")String search, Model model){
+    public String blockUser(@RequestParam(name = "search", defaultValue = "")String search){
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Roles role = userDetailsPrincipal.getRole();
 
@@ -158,24 +152,21 @@ public class ManageUsersController {
     }
 
     @GetMapping("/block/petitions")
-    public String blockPetitions(@RequestParam(name = "search", defaultValue = "") String search, Model model){
+    public String blockPetitions(@RequestParam(name = "search", defaultValue = "") String search){
+        petitionsToBlock.clear();
+
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         Roles role = userDetailsPrincipal.getRole();
-
-        petitionsToBlock.clear();
 
         switch(role){
             case ADMIN, SUPER -> petitionsToBlock.addAll(simplePetitionRepository.findByTitleContaining(search));
         }
-
-        System.out.println(petitionsToBlock.size());
 
         return "redirect:/admin";
     }
 
     @PostMapping("/block/petitions")
     public String blockPetitions(@RequestParam(name = "id") UUID id){
-
         simplePetitionRepository.findById(id).ifPresent(petition -> {
             petition.setValid(false);
             simplePetitionRepository.save(petition);
@@ -186,7 +177,6 @@ public class ManageUsersController {
 
     @PostMapping("/unblock/petitions")
     public String unblockPetitions(@RequestParam(name = "id") UUID id){
-
         simplePetitionRepository.findById(id).ifPresent(petition -> {
             petition.setValid(true);
             simplePetitionRepository.save(petition);

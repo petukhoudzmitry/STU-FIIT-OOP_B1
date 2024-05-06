@@ -81,8 +81,7 @@ let observer = new MutationObserver(callback);
 observer.observe(tabContent, config);
 
 function toggleTab() {
-  let id = event.target.id;
-  localStorage.setItem('lastTab', id);
+  localStorage.setItem('lastTab', event.target.id);
   toggleActiveTab();
 }
 

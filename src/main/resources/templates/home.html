@@ -12,6 +12,7 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/home-common.css">
     <link href="/css/sidebars.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/list-groups.css">
 
     <!-- Favicons -->
     <link rel="icon" href="/images/favicon.ico">
@@ -19,7 +20,7 @@
     <link rel="icon" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 </head>
-<body>
+<body onload="loadLastTab()">
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
     <symbol id="check2" viewBox="0 0 16 16">
         <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -77,25 +78,25 @@
         <hr>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="" class="nav-link active" aria-current="page">
+                <a id="home" href="#Home" class="nav-link text-white" aria-current="page" onclick="toggleTab()">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#home"/></svg>
                     Home
                 </a>
             </li>
             <li>
-                <a href="/home/companies" class="nav-link text-white">
+                <a id="companies" href="#Companies" class="nav-link text-white" onclick="toggleTab()">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#table"/></svg>
                     Companies
                 </a>
             </li>
             <li>
-                <a href="/home/petitions" class="nav-link text-white">
+                <a id="petitions" href="#Petitions" class="nav-link text-white" onclick="toggleTab()">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
                     Petitions
                 </a>
             </li>
             <li>
-                <a href="/home/users" class="nav-link text-white">
+                <a id="users" href="#Users" class="nav-link text-white" onclick="toggleTab()">
                     <svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
                     Users
                 </a>
@@ -122,43 +123,75 @@
 
     <div class="b-example-divider b-example-vr"></div>
 
-    <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center scrollable-container" style="flex: 1" th:if="${#authentication.authorities.iterator().next().getAuthority().equals(T(com.petition.platform.roles.Roles).USER.getName())}">
-        <div class="album py-5 d-flex flex-grow-1 overflow-auto">
-            <div class="container">
-                <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3">
-                    <h1 class="m-auto">Petitions you voted up</h1>
-                </div>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3 mb-5">
-                    <div th:each="petition : ${petitions}" class="col">
-                        <div class="card shadow-sm">
-                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
-                                <title>Placeholder</title>
-                                <rect width="100%" height="100%" fill="#55595c"></rect>
-                                <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text>
-                            </svg>
-                            <small class="text-body-secondary mt-1 ms-1" th:text="'To: ' + ${petition.company.username}"></small>
-                            <div class="card-body">
-                                <p class="card-text" th:text="${petition.text}"></p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group" th:if="${petition.validUntil.isAfter(T(java.time.LocalDateTime).now())}" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())">
-                                        <form method="post" role="form" action="/home/retract">
-                                            <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger">Retract vote</button>
-                                        </form>
+    <div id="tab-content" class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1 overflow-auto">
+        <div id="home-content" sec:authorize="isAuthenticated()">
+            <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center scrollable-container" style="flex: 1" sec:authorize="${hasRole(T(com.petition.platform.roles.Roles).USER.name)}">
+                <div class="album py-5 d-flex flex-grow-1 overflow-auto">
+                    <div class="container">
+                        <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3">
+                            <h1 class="m-auto">Petitions you voted up</h1>
+                        </div>
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3 mb-5">
+                            <div th:each="petition : ${votedUpPetitions}" class="col">
+                                <div class="card shadow-sm">
+                                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                                        <title>Placeholder</title>
+                                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                                        <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text>
+                                    </svg>
+                                    <small class="text-body-secondary mt-1 ms-1" th:text="'To: ' + ${petition.company.username}"></small>
+                                    <div class="card-body">
+                                        <p class="card-text" th:text="${petition.text}"></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="btn-group" th:if="${petition.validUntil.isAfter(T(java.time.LocalDateTime).now())}" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())">
+                                                <form method="post" role="form" action="/home/retract">
+                                                    <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger">Retract vote</button>
+                                                </form>
+                                            </div>
+                                            <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
+                                            <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
+                                        </div>
                                     </div>
-                                    <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
-                                    <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3">
+                            <h1 class="m-auto">Petitions you created</h1>
+                        </div>
+                        <div class="album py-5 d-flex flex-grow-1 overflow-auto mt-3">
+                            <div class="container">
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                                    <div th:each="petition : ${createdPetitions}" class="col">
+                                        <div class="card shadow-sm">
+                                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                                                <title>Placeholder</title>
+                                                <rect width="100%" height="100%" fill="#55595c"></rect>
+                                                <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text>
+                                            </svg>
+                                            <small class="text-body-secondary mt-1 ms-1" th:text="'To: ' + ${petition.company.username}"></small>
+                                            <div class="card-body">
+                                                <p class="card-text" th:text="${petition.text}"></p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
+                                                    <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3">
-                    <h1 class="m-auto">Petitions you created</h1>
-                </div>
-                <div class="album py-5 d-flex flex-grow-1 overflow-auto mt-3">
+            </div>
+            <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center scrollable-container" style="flex: 1" sec:authorize="${hasRole(T(com.petition.platform.roles.Roles).COMPANY.name)}">
+                <div class="album py-5 d-flex flex-grow-1 overflow-auto">
                     <div class="container">
-                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                            <div th:each="petition : ${createdPetitions}" class="col">
+                        <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3">
+                            <h1 class="m-auto">Your petitions</h1>
+                        </div>
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3 mb-5">
+                            <div th:each="petition : ${companyPetitions}" class="col">
                                 <div class="card shadow-sm">
                                     <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
                                         <title>Placeholder</title>
@@ -180,28 +213,99 @@
                 </div>
             </div>
         </div>
-    </div>
+        <div id="companies-content"  sec:authorize="isAuthenticated()">
+            <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1">
+                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/companies">
+                    <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
+                </form>
+                <div class="scrollable-container">
 
-    <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center scrollable-container" style="flex: 1" th:if="${#authentication.authorities.iterator().next().getAuthority().equals(T(com.petition.platform.roles.Roles).COMPANY.getName())}">
-        <div class="album py-5 d-flex flex-grow-1 overflow-auto">
-            <div class="container">
-                <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3">
-                    <h1 class="m-auto">Your petitions</h1>
+                    <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center overflow-auto" style="margin: auto; flex: 0.4;">
+
+                        <div th:if="${companies.isEmpty()}">
+                            <h1>There are no users yet...</h1>
+                        </div>
+
+                        <div class="list-group d-grid gap-2 border-0 overflow-auto flex-grow-1">
+
+                            <div th:each="company : ${companies}">
+                                <div class="div-user d-flex">
+                                    <img src="/images/company_avatar.svg" alt="company" width="32" height="32" class="rounded-circle me-2">
+                                    <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                                        <span><strong th:text="${company.username}"></strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mt-3 mb-5">
-                    <div th:each="petition : ${petitions}" class="col">
-                        <div class="card shadow-sm">
-                            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
-                                <title>Placeholder</title>
-                                <rect width="100%" height="100%" fill="#55595c"></rect>
-                                <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text>
-                            </svg>
-                            <small class="text-body-secondary mt-1 ms-1" th:text="'To: ' + ${petition.company.username}"></small>
-                            <div class="card-body">
-                                <p class="card-text" th:text="${petition.text}"></p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
-                                    <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
+            </div>
+        </div>
+        <div id="petitions-content" sec:authorize="isAuthenticated()">
+            <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1">
+
+                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/petitions">
+                    <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
+                </form>
+
+                <div class="album py-5 d-flex flex-grow-1 overflow-auto">
+                    <div class="container">
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                            <div th:each="petition : ${petitions}" class="col">
+                                <div class="card shadow-sm">
+                                    <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                                        <title>Placeholder</title>
+                                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                                        <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.title}"></text>
+                                    </svg>
+                                    <small class="text-body-secondary mt-1 ms-1" th:text="'To: ' + ${petition.company.username}"></small>
+                                    <div class="card-body">
+                                        <p class="card-text" th:text="${petition.text}"></p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="btn-group" th:if="${petition.validUntil.isAfter(T(java.time.LocalDateTime).now())}" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.name)">
+                                                <form method="post" role="form" action="/home/petitions/vote">
+                                                    <button type="submit" name="id" th:value="${petition.id}" class="btn btn-success" th:if="${!signedPetitions.contains(petition)}">Vote</button>
+                                                </form>
+                                                <form method="post" role="form" action="/home/petitions/retract">
+                                                    <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger" th:if="${signedPetitions.contains(petition)}">Retract vote</button>
+                                                </form>
+                                            </div>
+                                            <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
+                                            <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="users-content" sec:authorize="isAuthenticated()">
+            <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1">
+                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/users">
+                    <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
+                </form>
+                <div class="scrollable-container">
+                    <div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center overflow-auto" style="margin: auto; flex: 0.4;">
+
+                        <div th:if="${users.isEmpty()}">
+                            <h1>There are no users yet...</h1>
+                        </div>
+
+                        <div class="list-group d-grid gap-2 border-0 overflow-auto">
+
+                            <div th:each="user : ${users}">
+                                <div th:switch="${user.role}" class="div-user d-flex">
+                                    <img th:case="${T(com.petition.platform.roles.Roles).USER}" src="/images/user_avatar.svg" alt="user" width="32" height="32" class="rounded-circle me-2">
+                                    <img th:case="${T(com.petition.platform.roles.Roles).COMPANY}" src="/images/company_avatar.svg" alt="user" width="32" height="32" class="rounded-circle me-2">
+                                    <img th:case="${T(com.petition.platform.roles.Roles).ADMIN}" src="/images/admin_avatar.svg" alt="admin" width="32" height="32" class="rounded-circle me-2">
+                                    <img th:case="${T(com.petition.platform.roles.Roles).SUPER}" src="/images/super_avatar.svg" alt="super" width="32" height="32" class="rounded-circle me-2">
+                                    <div class="d-flex flex-grow-1 justify-content-center align-items-center">
+                                        <span><strong th:text="${user.username}"></strong></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -210,9 +314,10 @@
             </div>
         </div>
     </div>
-
 </main>
-<script src="/js/bootstrap.bundle.min.js"></script>
 
-<script src="/js/sidebars.js"></script></body>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/sidebars.js"></script>
+<script src="/js/home.js"></script>
+</body>
 </html>

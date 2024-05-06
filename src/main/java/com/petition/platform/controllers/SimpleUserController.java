@@ -30,20 +30,40 @@ public class SimpleUserController {
     @Autowired
     private SimplePetitionRepository simplePetitionRepository;
 
+    static List<User> foundedUsers = new ArrayList<>();
+    static List<AbstractPetition> foundedPetitions = new ArrayList<>();
+    static List<CompanyUser> foundedCompanies = new ArrayList<>();
+
     @GetMapping("")
     public String home(Model model) {
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Roles role = userDetailsPrincipal.getRole();
 
+        model.addAttribute("companies", foundedCompanies.isEmpty() ? companyUserRepository.findAll() : new ArrayList<>(foundedCompanies));
+
+        if(foundedUsers.isEmpty()){
+            List<User> users = new ArrayList<>(simpleUserRepository.findAll());
+            users.addAll(companyUserRepository.findAll());
+            users.addAll(adminUserRepository.findAll());
+            users.addAll(superUserRepository.findAll());
+            model.addAttribute("users", users);
+        }else{
+            model.addAttribute("users", new ArrayList<>(foundedUsers));
+        }
+
+        model.addAttribute("petitions", foundedPetitions.isEmpty() ? simplePetitionRepository.findAll() : new ArrayList<>(foundedPetitions));
+
         switch(role){
-            case Roles.USER -> {
-                SimpleUser user = simpleUserRepository.findById(userDetailsPrincipal.getId()).get();
-                model.addAttribute("petitions", user.getSignedPetitions());
-                model.addAttribute("createdPetitions", user.getPetitions());}
-            case Roles.COMPANY -> {
-                CompanyUser user = companyUserRepository.findById(userDetailsPrincipal.getId()).get();
-                model.addAttribute("petitions", user.getPetitions());
-            }
+            case Roles.USER -> simpleUserRepository.findById(userDetailsPrincipal.getId()).ifPresent(
+                    user -> {
+                        model.addAttribute("votedUpPetitions", user.getSignedPetitions());
+                        model.addAttribute("createdPetitions", user.getPetitions());
+                        model.addAttribute("signedPetitions", user.getSignedPetitions());
+                    }
+            );
+            case Roles.COMPANY -> companyUserRepository.findById(userDetailsPrincipal.getId()).ifPresent(
+                    user -> model.addAttribute("companyPetitions", user.getPetitions())
+            );
             case Roles.ADMIN -> {
 //                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
             }
@@ -51,15 +71,14 @@ public class SimpleUserController {
 //                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
             }
         }
-
         return "home";
-
     }
 
     @GetMapping("/companies")
-    public String companies(@RequestParam(name="search", defaultValue = "") String search, Model model) {
-        model.addAttribute("companies", companyUserRepository.findByUsernameContaining(search));
-        return "home-companies";
+    public String companies(@RequestParam(name="search", defaultValue = "") String search) {
+        foundedCompanies.clear();
+        foundedCompanies.addAll(companyUserRepository.findByUsernameContaining(search));
+        return "redirect:/home";
     }
 
     @PostMapping("/retract")
@@ -67,48 +86,59 @@ public class SimpleUserController {
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (userDetailsPrincipal.getRole() == Roles.USER) {
-            SimpleUser user = simpleUserRepository.findById(userDetailsPrincipal.getId()).get();
-            user.getSignedPetitions().removeIf(e -> e.equals(simplePetitionRepository.findById(id).get()));
-            simpleUserRepository.save(user);
+            simpleUserRepository.findById(userDetailsPrincipal.getId()).ifPresent(
+                    user -> {
+                        simplePetitionRepository.findById(id).ifPresent(user.getSignedPetitions()::remove);
+                        simpleUserRepository.save(user);
+                    }
+            );
         }
-
         return "redirect:/home";
     }
 
     @GetMapping("/petitions")
-    public String petitions(@RequestParam(name = "search", defaultValue = "") String search, Model model) {
-        List<SimplePetition> simplePetitions = new ArrayList<>(simplePetitionRepository.findByTitleContaining(search));
-        simplePetitions.addAll(simplePetitionRepository.findByTextContaining(search));
-        simplePetitions.addAll(simplePetitionRepository.findByCompanyUsernameContaining(search));
-        simplePetitions = simplePetitions.stream().sorted().distinct().sorted(Comparator.comparing(AbstractPetition::getValidUntil)).toList();
-        model.addAttribute("petitions", simplePetitions);
-        model.addAttribute("signedPetitions", simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).get().getSignedPetitions());
-        return "home-petitions";
+    public String petitions(@RequestParam(name = "search", defaultValue = "") String search) {
+        foundedPetitions.clear();
+        foundedPetitions.addAll(simplePetitionRepository.findByTitleContaining(search));
+        foundedPetitions.addAll(simplePetitionRepository.findByTextContaining(search));
+        foundedPetitions.addAll(simplePetitionRepository.findByCompanyUsernameContaining(search));
+        foundedPetitions = foundedPetitions.stream().sorted().distinct().sorted(Comparator.comparing(AbstractPetition::getValidUntil)).toList();
+        return "redirect:/home";
     }
 
     @PostMapping("/petitions/vote")
     public String vote(@RequestParam(name = "id") UUID id){
-        SimpleUser simpleUser = simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).get();
-        simpleUser.getSignedPetitions().add(simplePetitionRepository.findById(id).get());
-        simpleUserRepository.save(simpleUser);
-        return "redirect:/home/petitions";
+        simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).ifPresent(
+                user -> simplePetitionRepository.findById(id).ifPresent(
+                        petition -> {
+                            user.getSignedPetitions().add(petition);
+                            simpleUserRepository.save(user);
+                        }
+                )
+        );
+        return "redirect:/home";
     }
 
     @PostMapping("/petitions/retract")
     public String retract(@RequestParam(name = "id") UUID id){
-        SimpleUser simpleUser = simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).get();
-        simpleUser.getSignedPetitions().removeIf(e -> e.equals(simplePetitionRepository.findById(id).get()));
-        simpleUserRepository.save(simpleUser);
-        return "redirect:/home/petitions";
+        simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).ifPresent(
+                user -> simplePetitionRepository.findById(id).ifPresent(
+                        petition -> {
+                            user.getSignedPetitions().remove(petition);
+                            simpleUserRepository.save(user);
+                        }
+                )
+        );
+        return "redirect:/home";
     }
 
     @GetMapping("/users")
-    public String searchUsers(@RequestParam(name="search", defaultValue = "") String search, Model model){
-        List<User> list = new ArrayList<>(simpleUserRepository.findByUsernameContaining(search));
-        list.addAll(adminUserRepository.findByUsernameContaining(search));
-        list.addAll(superUserRepository.findByUsernameContaining(search));
-        list.sort(Comparator.comparing(a -> a.getUsername().toUpperCase()));
-        model.addAttribute("users", list);
-        return "home-users";
+    public String searchUsers(@RequestParam(name="search", defaultValue = "") String search){
+        foundedUsers.clear();
+        foundedUsers.addAll(simpleUserRepository.findByUsernameContaining(search));
+        foundedUsers.addAll(adminUserRepository.findByUsernameContaining(search));
+        foundedUsers.addAll(superUserRepository.findByUsernameContaining(search));
+        foundedUsers.sort(Comparator.comparing(a -> a.getUsername().toUpperCase()));
+        return "redirect:/home";
     }
 }
