@@ -13,4 +13,5 @@ public interface SuperUserRepository extends JpaRepository<SuperUser, Long> {
     Optional<SuperUser> findByUsername(String email);
     List<SuperUser> findByUsernameContaining(String username);
     List<SuperUser> findAllByIsRootIsFalse();
+    List<SuperUser> findAllByUsernameContainingAndIsRootIsFalse(String username);
 }

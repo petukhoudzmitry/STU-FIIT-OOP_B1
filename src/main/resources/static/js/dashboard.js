@@ -1,9 +1,15 @@
-(() => {
+let myChart;
+
+function drawChart() {
   'use strict'
 
   const ctx = document.getElementById('myChart')
 
-  const myChart = new Chart(ctx, {
+  if(myChart){
+    myChart.destroy();
+  }
+
+  myChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: [
@@ -16,12 +22,12 @@
       ],
       datasets: [{
         data: [
-          document.getElementById('simpleUsers').textContent,
-          document.getElementById('companyUsers').textContent,
-          document.getElementById('adminUsers').textContent,
-          document.getElementById('superUsers').textContent,
-          document.getElementById('users').textContent,
-          document.getElementById('petitions').textContent
+          document.getElementById('simpleUsersCount').textContent,
+          document.getElementById('companyUsersCount').textContent,
+          document.getElementById('adminUsersCount').textContent,
+          document.getElementById('superUsersCount').textContent,
+          document.getElementById('usersCount').textContent,
+          document.getElementById('petitionsCount').textContent
         ],
         lineTension: 0,
         backgroundColor: '#007bff',
@@ -41,4 +47,58 @@
       }
     }
   })
-})()
+}
+
+let tabs = [
+  document.getElementById('dashboard'),
+  document.getElementById('block-users'),
+  document.getElementById('block-petitions')
+];
+
+let tabContents = [
+  document.getElementById('dashboard-content'),
+  document.getElementById('block-users-content'),
+  document.getElementById('block-petitions-content')
+];
+
+const tabContent = document.getElementById('tab-content');
+
+let config = {childList: true, subtree: true};
+
+let callback = function(mutationsList, observer) {
+  for(let mutation of mutationsList) {
+    if(mutation.type === 'childList'){
+      if(document.getElementById('myChart')) {
+        drawChart();
+        observer.disconnect();
+      }
+    }
+  }
+}
+
+let observer = new MutationObserver(callback);
+
+observer.observe(tabContent, config);
+
+function toggleTab() {
+  let id = event.target.id;
+  localStorage.setItem('lastTab', id);
+  toggleActiveTab();
+}
+
+function toggleActiveTab() {
+  let c;
+  if((c = localStorage.getItem('lastTab')) === null){
+    localStorage.setItem('lastTab', 'dashboard');
+    c = 'dashboard';
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.classList.remove('active');
+    tabContents[index].remove();
+    if(tab.id === c){
+      tab.classList.add('active');
+      tabContent.appendChild(tabContents[index]);
+    }
+  });
+}

@@ -1,5 +1,6 @@
 package com.petition.platform.services;
 
+import com.petition.platform.models.SuperUser;
 import com.petition.platform.models.User;
 import com.petition.platform.roles.Roles;
 import org.springframework.security.core.GrantedAuthority;
@@ -58,5 +59,9 @@ public class UserDetailsPrincipal implements UserDetails {
 
     public Long getId(){
         return user.getId();
+    }
+
+    public boolean getIsRoot() {
+        return user instanceof SuperUser ? ((SuperUser) user).getRoot() : false;
     }
 }

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 
   <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/home-common.css">
 
   <style>
     .bi {
@@ -67,7 +68,7 @@
   <link rel="icon" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 </head>
-<body>
+<body onload="toggleActiveTab()">
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
   <symbol id="check2" viewBox="0 0 16 16">
     <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
@@ -118,7 +119,6 @@
     </li>
   </ul>
 </div>
-
 
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
   <symbol id="calendar3" viewBox="0 0 16 16">
@@ -183,17 +183,17 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center gap-2 active" aria-current="page" href="/admin">
+              <a id="dashboard" class="nav-link d-flex align-items-center gap-2" aria-current="page" href="#Dashboard" onclick="toggleTab()">
                 Dashboard
               </a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.getName(), T(com.petition.platform.roles.Roles).SUPER.getName())">
-              <a class="nav-link d-flex align-items-center gap-2" href="/admin/block/users">
+              <a id="block-users" class="nav-link d-flex align-items-center gap-2" href="#blockUsers" onclick="toggleTab()">
                 Block Users
               </a>
             </li>
             <li class="nav-item" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.getName(), T(com.petition.platform.roles.Roles).SUPER.getName())">
-              <a class="nav-link d-flex align-items-center gap-2" href="">
+              <a id="block-petitions" class="nav-link d-flex align-items-center gap-2" href="#blockPetitions" onclick="toggleTab()">
                 Block Petitions
               </a>
             </li>
@@ -218,43 +218,126 @@
       </div>
     </div>
 
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Dashboard</h1>
+    <main id="tab-content" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div id="dashboard-content" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Dashboard</h1>
+        </div>
+
+        <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+
+        <h2>Section title</h2>
+        <div class="table-responsive small">
+          <table class="table table-striped table-sm h">
+            <thead>
+            <tr>
+              <th scope="col" class="text-center">Simple Users</th>
+              <th scope="col" class="text-center">Company Users</th>
+              <th scope="col" class="text-center">Admin Users</th>
+              <th scope="col" class="text-center">Super Users</th>
+              <th scope="col" class="text-center">Total Users</th>
+              <th scope="col" class="text-center">Petitions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td id="simpleUsersCount" th:text="${simpleUsersCount}" class="text-center"></td>
+              <td id="companyUsersCount" th:text="${companyUsersCount}" class="text-center"></td>
+              <td id="adminUsersCount" th:text="${adminUsersCount}" class="text-center"></td>
+              <td id="superUsersCount" th:text="${superUsersCount}" class="text-center"></td>
+              <td id="usersCount" th:text="${simpleUsersCount + companyUsersCount + adminUsersCount + superUsersCount}" class="text-center"></td>
+              <td id="petitionsCount" th:text="${petitionsCount}" class="text-center"></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+      <div id="block-users-content" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3 mt-3" role="search" method="get" action="/admin/block/users">
+          <input name="search" type="search" class="form-control custom-search-input m-auto" style="flex: 0.6;" placeholder="Search..." aria-label="Search">
+        </form>
 
-      <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
-
-      <h2>Section title</h2>
-      <div class="table-responsive small">
-        <table class="table table-striped table-sm h">
-          <thead>
-          <tr>
-            <th scope="col" class="text-center">Simple Users</th>
-            <th scope="col" class="text-center">Company Users</th>
-            <th scope="col" class="text-center">Admin Users</th>
-            <th scope="col" class="text-center">Super Users</th>
-            <th scope="col" class="text-center">Total Users</th>
-            <th scope="col" class="text-center">Petitions</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td id="simpleUsers" th:text="${simpleUsers}" class="text-center"></td>
-            <td id="companyUsers" th:text="${companyUsers}" class="text-center"></td>
-            <td id="adminUsers" th:text="${adminUsers}" class="text-center"></td>
-            <td id="superUsers" th:text="${superUsers}" class="text-center"></td>
-            <td id="users" th:text="${simpleUsers + companyUsers + adminUsers + superUsers}" class="text-center"></td>
-            <td id="petitions" th:text="${petitions}" class="text-center"></td>
-          </tr>
-          </tbody>
-        </table>
+        <div class="album py-5 d-flex flex-grow-1 overflow-auto">
+          <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+              <div th:each="user : ${users}" class="col">
+                <div class="card shadow-sm">
+                  <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <title>Placeholder</title>
+                    <rect width="100%" height="100%" fill="#55595c"></rect>
+                    <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${user.username}"></text>
+                  </svg>
+                  <small class="text-body-secondary mt-1 ms-1" th:text="'Id: ' + ${user.id}"></small>
+                  <small class="text-body-emphasis mt-1 ms-1" th:text="'Email: ' + ${user.email}"></small>
+                  <small class="text-body-secondary mt-1 ms-1" th:text="'Since: ' + ${user.createdAt}"></small>
+                  <small class="text-body-secondary mt-1 ms-1" th:text="'Updated: ' + ${user.updatedAt}"></small>
+                  <small class="text-body-emphasis mt-1 ms-1" th:text="'Role: ' + ${user.role}"></small>
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="btn-group">
+                        <form method="post" role="form" action="/admin/block/users" th:if="${user.enabled}">
+                          <button type="submit" name="email" th:value="${user.email}" class="btn btn-secondary" th:if="${user.role == T(com.petition.platform.roles.Roles).USER}">Block</button>
+                          <button type="submit" name="email" th:value="${user.email}" class="btn btn-info" th:if="${user.role == T(com.petition.platform.roles.Roles).COMPANY}">Block</button>
+                          <button type="submit" name="email" th:value="${user.email}" class="btn btn-warning" th:if="${user.role == T(com.petition.platform.roles.Roles).ADMIN}">Block</button>
+                          <button type="submit" name="email" th:value="${user.email}" class="btn btn-danger" th:if="${user.role == T(com.petition.platform.roles.Roles).SUPER}">Block</button>
+                        </form>
+                        <form method="post" role="form" action="/admin/unblock/users" th:if="${!user.enabled}">
+                          <button type="submit" name="email" th:value="${user.email}" class="btn btn-danger">Unblock</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
+      <div id="block-petitions-content" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3 mt-3" role="search" method="get" action="/admin/block/petitions">
+          <input name="search" type="search" class="form-control custom-search-input m-auto" style="flex: 0.6;" placeholder="Search..." aria-label="Search">
+        </form>
+        <div class="album py-5 d-flex flex-grow-1 overflow-auto">
+          <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+              <div th:each="petition : ${petitions}" class="col">
+                <div class="card shadow-sm">
+                  <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <title>Placeholder</title>
+                    <rect width="100%" height="100%" fill="#55595c"></rect>
+                    <text style="white-space: pre;" x="50%" y="50%" fill="#eceeef" dy=".3em" th:text="${petition.text}"></text>
+                  </svg>
+                  <small class="text-body-emphasis mt-1 ms-1" th:text="'Title: ' + ${petition.title}"></small>
+                  <small class="text-body-emphasis mt-1 ms-1" th:text="'Id: ' + ${petition.id}"></small>
+                  <small class="text-body-emphasis mt-1 ms-1" th:text="'Creator\'s email: ' + ${petition.creator.email}"></small>
+                  <small class="text-body-emphasis mt-1 ms-1" th:text="'Company\'s email: ' + ${petition.company.email}"></small>
+                  <small class="text-body-secondary mt-1 ms-1" th:text="'Since: ' + ${petition.createdAt}"></small>
+                  <small class="text-body-secondary mt-1 ms-1" th:text="'Until: ' + ${petition.validUntil}"></small>
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="btn-group">
+                        <form method="post" role="form" action="/admin/block/petitions" th:if="${petition.isValid}">
+                          <button type="submit" name="id" th:value="${petition.id}" class="btn btn-warning">Block</button>
+                        </form>
+                        <form method="post" role="form" action="/admin/unblock/petitions" th:if="${!petition.isValid}">
+                          <button type="submit" name="id" th:value="${petition.id}" class="btn btn-success">Unblock</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 </div>
 <script src="/js/bootstrap.bundle.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script><script src="/js/dashboard.js"></script></body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js" integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp" crossorigin="anonymous"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/sidebars.js"></script>
+</body>
 </html>
