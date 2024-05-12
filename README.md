@@ -30,5 +30,5 @@ PC Platform is a web application that provides users with an interactive environ
   * DAO - [repositories](/tree/main/src/main/java/com/petition/platform/repositories "repositories")
   * Dependency Injection - All services are injected into controllers
   * Inversion of Control - Spring ApplicationContext
-  * Aggregation - [Aggregation](./blob/main/src/main/java/com/petition/platform/models/SimpleUser.java "Aggregation") - list of SimplePetitions in SimpleUser class
+  * Aggregation - [Aggregation](src/main/java/com/petition/platform/models/SimpleUser.java "Aggregation") - list of SimplePetitions in SimpleUser class
   * 
