@@ -2,10 +2,11 @@ package com.petition.platform.controllers;
 
 import com.petition.platform.models.CompanyUser;
 import com.petition.platform.models.SimpleUser;
+import com.petition.platform.ooprequirements.CompanyUserFactory;
+import com.petition.platform.ooprequirements.SimpleUserFactory;
 import com.petition.platform.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,21 +22,22 @@ public class AuthController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+
     @GetMapping("/register")
     public String register(Model model){
         if(isAuthenticated()){
             return "redirect:/home";
         }
-        model.addAttribute(new SimpleUser());
+        model.addAttribute(new SimpleUserFactory().createUser());
         return "register";
     }
 
     @GetMapping("/register/company")
-    public String registerCompany(@RequestParam(name="", defaultValue="") Model model){
+    public String registerCompany(@RequestParam(defaultValue="") Model model){
         if(isAuthenticated()){
             return "redirect:/home";
         }
-        model.addAttribute(new CompanyUser());
+        model.addAttribute(new CompanyUserFactory().createUser());
         return "register-company";
     }
 

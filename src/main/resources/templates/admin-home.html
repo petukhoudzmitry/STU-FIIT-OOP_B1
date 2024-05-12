@@ -219,7 +219,7 @@
     </div>
 
     <main id="tab-content" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-      <div id="dashboard-content" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
+      <div id="dashboard-content" hidden sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Dashboard</h1>
         </div>
@@ -252,7 +252,7 @@
           </table>
         </div>
       </div>
-      <div id="block-users-content" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
+      <div id="block-users-content" hidden sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3 mt-3" role="search" method="get" action="/admin/block/users">
           <input name="search" type="search" class="form-control custom-search-input m-auto" style="flex: 0.6;" placeholder="Search..." aria-label="Search">
         </form>
@@ -293,7 +293,7 @@
           </div>
         </div>
       </div>
-      <div id="block-petitions-content" sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
+      <div id="block-petitions-content" hidden sec:authorize="hasAnyRole(T(com.petition.platform.roles.Roles).ADMIN.name, T(com.petition.platform.roles.Roles).SUPER.name)">
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3 mt-3" role="search" method="get" action="/admin/block/petitions">
           <input name="search" type="search" class="form-control custom-search-input m-auto" style="flex: 0.6;" placeholder="Search..." aria-label="Search">
         </form>

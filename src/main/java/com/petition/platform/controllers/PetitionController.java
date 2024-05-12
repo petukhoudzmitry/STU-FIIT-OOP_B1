@@ -34,7 +34,7 @@ public class PetitionController {
 
     @PostMapping("/add")
     public String add(@RequestParam(name = "companyId") Long id, SimplePetition petition) {
-        petition.setCreator(simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).get());
+        simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).ifPresent(petition::setCreator);
 
         return customPetitionDetailsService.addPetition(petition, id) ? "redirect:/petition/add?success" : "redirect:/petition/add?failure";
     }

@@ -3,21 +3,18 @@ package com.petition.platform.controllers;
 import com.petition.platform.models.*;
 import com.petition.platform.repositories.*;
 import com.petition.platform.roles.Roles;
-import com.petition.platform.services.CustomUserDetailsService;
 import com.petition.platform.services.UserDetailsPrincipal;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Controller
 @RequestMapping("/home")
-public class SimpleUserController {
+public class HomeController {
 
     @Autowired
     private SimpleUserRepository simpleUserRepository;
@@ -30,9 +27,9 @@ public class SimpleUserController {
     @Autowired
     private SimplePetitionRepository simplePetitionRepository;
 
-    static List<User> foundedUsers = new ArrayList<>();
+    static final List<User> foundedUsers = new ArrayList<>();
     static List<AbstractPetition> foundedPetitions = new ArrayList<>();
-    static List<CompanyUser> foundedCompanies = new ArrayList<>();
+    static final List<CompanyUser> foundedCompanies = new ArrayList<>();
 
     @GetMapping("")
     public String home(Model model) {
@@ -102,7 +99,7 @@ public class SimpleUserController {
         foundedPetitions.addAll(simplePetitionRepository.findByTitleContaining(search));
         foundedPetitions.addAll(simplePetitionRepository.findByTextContaining(search));
         foundedPetitions.addAll(simplePetitionRepository.findByCompanyUsernameContaining(search));
-        foundedPetitions = foundedPetitions.stream().sorted().distinct().sorted(Comparator.comparing(AbstractPetition::getValidUntil)).toList();
+        foundedPetitions = new ArrayList<>(foundedPetitions.stream().sorted().distinct().sorted(Comparator.comparing(AbstractPetition::getValidUntil)).toList());
         return "redirect:/home";
     }
 

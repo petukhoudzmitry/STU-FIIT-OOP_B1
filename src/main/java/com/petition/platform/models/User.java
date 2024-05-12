@@ -4,11 +4,11 @@ import com.petition.platform.roles.Roles;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @MappedSuperclass
-public class User {
+public class User implements Serializable {
 
     public User() {}
 

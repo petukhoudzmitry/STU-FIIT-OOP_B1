@@ -1,7 +1,7 @@
 package com.petition.platform.models;
 
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -141,9 +141,8 @@ public class AbstractPetition implements Comparable<AbstractPetition>{
         return false;
     }
 
-
     @Override
-    public int compareTo(AbstractPetition o) {
-        return o == null ? -1 : this.id.compareTo(o.id);
+    public int compareTo(@NonNull AbstractPetition o) {
+        return this.id.compareTo(o.id);
     }
 }

@@ -36,8 +36,8 @@ public class ManageUsersController {
     @Autowired
     SimplePetitionRepository simplePetitionRepository;
 
-    static List<User> usersToBlock = new ArrayList<>();
-    static List<AbstractPetition> petitionsToBlock = new ArrayList<>();
+    static final List<User> usersToBlock = new ArrayList<>();
+    static final List<AbstractPetition> petitionsToBlock = new ArrayList<>();
 
     @GetMapping("")
     public String adminHome(Model model){

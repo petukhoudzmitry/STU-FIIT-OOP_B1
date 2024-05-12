@@ -49,17 +49,11 @@ function drawChart() {
   })
 }
 
-let tabs = [
-  document.getElementById('dashboard'),
-  document.getElementById('block-users'),
-  document.getElementById('block-petitions')
-];
+const map = new Map();
 
-let tabContents = [
-  document.getElementById('dashboard-content'),
-  document.getElementById('block-users-content'),
-  document.getElementById('block-petitions-content')
-];
+map.set(document.getElementById('dashboard'), document.getElementById('dashboard-content'));
+map.set(document.getElementById('block-users'), document.getElementById('block-users-content'));
+map.set(document.getElementById('block-petitions'), document.getElementById('block-petitions-content'));
 
 const tabContent = document.getElementById('tab-content');
 
@@ -92,12 +86,14 @@ function toggleActiveTab() {
     c = 'dashboard';
   }
 
-  tabs.forEach((tab, index) => {
-    tab.classList.remove('active');
-    tabContents[index].remove();
-    if(tab.id === c){
-      tab.classList.add('active');
-      tabContent.appendChild(tabContents[index]);
+  map.forEach((value, key) => {
+    key.classList.remove('active');
+    value.hidden = true;
+    value.remove();
+    if(key.id === c){
+      key.classList.add('active');
+      tabContent.appendChild(value);
+      value.hidden = false;
     }
   });
 }

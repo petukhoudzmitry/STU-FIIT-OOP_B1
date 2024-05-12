@@ -1,16 +1,8 @@
-let tabs = [
-    document.getElementById('home'),
-    document.getElementById('companies'),
-    document.getElementById('petitions'),
-    document.getElementById('users')
-];
-
-let contents = [
-    document.getElementById('home-content'),
-    document.getElementById('companies-content'),
-    document.getElementById('petitions-content'),
-    document.getElementById('users-content')
-];
+const map = new Map();
+map.set(document.getElementById('home'), document.getElementById('home-content'));
+map.set(document.getElementById('companies'), document.getElementById('companies-content'));
+map.set(document.getElementById('petitions'), document.getElementById('petitions-content'));
+map.set(document.getElementById('users'), document.getElementById('users-content'));
 
 const tabContent = document.getElementById('tab-content');
 
@@ -20,20 +12,22 @@ function toggleTab() {
 }
 
 function loadLastTab() {
-    let lastTab;
-    if((lastTab = localStorage.getItem('homeLastTab')) === null) {
+    let lastTab = localStorage.getItem('homeLastTab');
+    if(!lastTab) {
         lastTab = 'home';
         localStorage.setItem('homeLastTab', lastTab);
     }
 
-    tabs.forEach((tab, index) => {
-        tab.classList.remove('active');
-        tab.classList.add('text-white');
-        contents[index].remove();
-        if(tab.id === lastTab) {
-            tab.classList.remove('text-white');
-            tab.classList.add('active');
-            tabContent.appendChild(contents[index]);
+    map.forEach((value, key) => {
+        key.classList.remove('active');
+        key.classList.add('text-white');
+        value.remove();
+        value.hidden = true;
+        if(key.id === lastTab) {
+            key.classList.remove('text-white');
+            key.classList.add('active');
+            tabContent.appendChild(value);
+            value.hidden = false;
         }
     });
 }

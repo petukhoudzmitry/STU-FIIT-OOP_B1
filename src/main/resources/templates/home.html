@@ -124,7 +124,7 @@
     <div class="b-example-divider b-example-vr"></div>
 
     <div id="tab-content" class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1 overflow-auto">
-        <div id="home-content" sec:authorize="isAuthenticated()">
+        <div id="home-content" hidden sec:authorize="isAuthenticated()">
             <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center scrollable-container" style="flex: 1" sec:authorize="${hasRole(T(com.petition.platform.roles.Roles).USER.name)}">
                 <div class="album py-5 d-flex flex-grow-1 overflow-auto">
                     <div class="container">
@@ -144,9 +144,10 @@
                                         <p class="card-text" th:text="${petition.text}"></p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group" th:if="${petition.validUntil.isAfter(T(java.time.LocalDateTime).now())}" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.getName())">
-                                                <form method="post" role="form" action="/home/retract">
+                                                <form method="post" role="form" action="/home/retract" th:if="${petition.isValid}">
                                                     <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger">Retract vote</button>
                                                 </form>
+                                                <button type="submit" name="id" th:value="${petition.id}" th:if="${!petition.isValid}" class="btn btn-info" disabled>Blocked</button>
                                             </div>
                                             <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
                                             <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
@@ -213,7 +214,7 @@
                 </div>
             </div>
         </div>
-        <div id="companies-content"  sec:authorize="isAuthenticated()">
+        <div id="companies-content"  hidden sec:authorize="isAuthenticated()">
             <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1">
                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/companies">
                     <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
@@ -242,7 +243,7 @@
                 </div>
             </div>
         </div>
-        <div id="petitions-content" sec:authorize="isAuthenticated()">
+        <div id="petitions-content" hidden sec:authorize="isAuthenticated()">
             <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1">
 
                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/petitions">
@@ -264,12 +265,17 @@
                                         <p class="card-text" th:text="${petition.text}"></p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group" th:if="${petition.validUntil.isAfter(T(java.time.LocalDateTime).now())}" sec:authorize="hasRole(T(com.petition.platform.roles.Roles).USER.name)">
-                                                <form method="post" role="form" action="/home/petitions/vote">
-                                                    <button type="submit" name="id" th:value="${petition.id}" class="btn btn-success" th:if="${!signedPetitions.contains(petition)}">Vote</button>
-                                                </form>
-                                                <form method="post" role="form" action="/home/petitions/retract">
-                                                    <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger" th:if="${signedPetitions.contains(petition)}">Retract vote</button>
-                                                </form>
+                                                <div th:if="${petition.isValid}">
+                                                    <form method="post" role="form" action="/home/petitions/vote">
+                                                        <button type="submit" name="id" th:value="${petition.id}" class="btn btn-success" th:if="${!signedPetitions.contains(petition)}">Vote</button>
+                                                    </form>
+                                                    <form method="post" role="form" action="/home/petitions/retract">
+                                                        <button type="submit" name="id" th:value="${petition.id}" class="btn btn-danger" th:if="${signedPetitions.contains(petition)}">Retract vote</button>
+                                                    </form>
+                                                </div>
+                                                <div th:if="${!petition.isValid}">
+                                                    <button type="submit" name="id" class="btn btn-info" disabled th:if="${signedPetitions.contains(petition)}">Blocked</button>
+                                                </div>
                                             </div>
                                             <small class="text-body-secondary" th:text="'Until: ' + ${petition.validUntil.getYear()} + '-' + ${petition.validUntil.getMonth()} + '-' + ${petition.validUntil.getDayOfMonth()}"></small>
                                             <small class="text-body-secondary" th:text="'votes: ' + ${petition.voters.size()}"></small>
@@ -283,7 +289,7 @@
 
             </div>
         </div>
-        <div id="users-content" sec:authorize="isAuthenticated()">
+        <div id="users-content" hidden sec:authorize="isAuthenticated()">
             <div class="d-flex flex-column flex-shrink-0 p-3 align-content-center flex-grow-1">
                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex border-bottom border-secondary-subtle pb-3" role="search" method="get" action="/home/users">
                     <input name="search" type="search" class="form-control custom-search-input" placeholder="Search..." aria-label="Search">
