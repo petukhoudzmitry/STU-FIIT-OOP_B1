@@ -106,7 +106,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 try(ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)))){
                     SuperUser superUser = (SuperUser) ois.readObject();
                     superUserRepository.findByEmail(superUser.getEmail()).ifPresent(user -> {
-                        if(user.equals(superUser)){superUserRepository.delete(user);}
+                        if(user.equals(superUser) && !user.getRoot()){
+                            superUserRepository.delete(user);
+                            file.delete();
+                        }
                     });
                 }catch(IOException | ClassNotFoundException ex){
                     System.out.println(ex.getMessage());
