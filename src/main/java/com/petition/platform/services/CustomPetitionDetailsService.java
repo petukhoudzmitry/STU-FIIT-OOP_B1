@@ -16,8 +16,15 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service class for managing custom petition-related operations.
+ */
 @Service
 public class CustomPetitionDetailsService implements UserDetailsService {
+    /**
+     * default constructor for CustomPetitionDetailsService.
+     */
+    public CustomPetitionDetailsService() {}
 
     @Autowired
     private CompanyUserRepository companyUserRepository;
@@ -30,11 +37,25 @@ public class CustomPetitionDetailsService implements UserDetailsService {
         eventManager.subscribe(Actions.CREATE_PETITION, new CreatePetitionActionListener());
     }
 
+    /**
+     * Loads a user by username (in this case, by petition title).
+     *
+     * @param username the title of the petition.
+     * @return the user details principal associated with the petition title.
+     * @throws UsernameNotFoundException if the petition title is not found.
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return new PetitionDetailsPrincipal(simplePetitionRepository.findByTitleContaining(username).getFirst());
     }
 
+    /**
+     * Adds a new petition.
+     *
+     * @param simplePetition the petition to add.
+     * @param id             the ID of the company user adding the petition.
+     * @return true if the petition is successfully added, false otherwise.
+     */
     public boolean addPetition(SimplePetition simplePetition, Long id) {
         CompanyUser[] companyUser = new CompanyUser[1];
         companyUserRepository.findById(id).ifPresent(user -> companyUser[0] = user);
@@ -54,6 +75,12 @@ public class CustomPetitionDetailsService implements UserDetailsService {
         return true;
     }
 
+    /**
+     * Sets up default values for a new petition.
+     *
+     * @param simplePetition the petition to set up.
+     * @param companyUser    the company user associated with the petition.
+     */
     public void setupDefaultSimplePetition(SimplePetition simplePetition, CompanyUser companyUser) {
         simplePetition.setCompany(companyUser);
         simplePetition.setIsValid(true);

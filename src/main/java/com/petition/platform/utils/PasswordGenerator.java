@@ -2,7 +2,14 @@ package com.petition.platform.utils;
 
 import java.util.Random;
 
+/**
+ * Utility class for generating random passwords.
+ */
 public class PasswordGenerator {
+    /**
+     * Private constructor to prevent instantiation of the class.
+     */
+    private PasswordGenerator() {}
 
     private static final String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
@@ -10,6 +17,12 @@ public class PasswordGenerator {
     private static final String numbers = "1234567890";
     private static final String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
 
+    /**
+     * Generates a random password of the specified length.
+     *
+     * @param length the length of the password to generate.
+     * @return a randomly generated password.
+     */
     public static String generatePassword(int length) {
         Random random = new Random(System.currentTimeMillis());
         char[] password = new char[length];

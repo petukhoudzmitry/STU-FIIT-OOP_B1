@@ -22,8 +22,15 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.time.LocalDateTime;
 
+/**
+ * Service class for managing custom user-related operations.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
+    /**
+     * Default constructor for CustomUserDetailsService.
+     */
+    public CustomUserDetailsService() {}
 
     @Autowired
     private SimpleUserRepository simpleUserSimpleUserRepository;
@@ -40,6 +47,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         eventManager.subscribe(Actions.CREATE_USER, new CreateUserActionListener());
     }
 
+    /**
+     * Loads a user by email address.
+     *
+     * @param email the email address of the user.
+     * @return the UserDetailsPrincipal associated with the email address.
+     * @throws UsernameNotFoundException if the user with the specified email address is not found.
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         final UserDetailsPrincipal[] userDetailsPrincipal = new UserDetailsPrincipal[1];
@@ -60,6 +74,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         return userDetailsPrincipal[0];
     }
 
+    /**
+     * Initializes the root superUser if none exists.
+     */
     @Bean
     public void rootSuperUserPersist(){
         if(superUserRepository.count() == 0L){
@@ -98,6 +115,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
     }
 
+    /**
+     * Adds a new user.
+     *
+     * @param user the user to add.
+     * @return true if the user is successfully added, false otherwise.
+     * @throws NullPointerException if the user is null.
+     */
     public boolean addUser(User user) throws NullPointerException {
         try{
             loadUserByUsername(user.getEmail());
@@ -112,6 +136,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
+    /**
+     * Adds a company user.
+     *
+     * @param user the company user to add.
+     * @return true if the company user is successfully added, false otherwise.
+     * @throws NullPointerException if the user is null.
+     */
     public boolean addCompanyUser(User user) throws NullPointerException {
         if(companyUserRepository.findByEmail((user.getEmail())).isEmpty()){
             setupDefaultUser(user);
@@ -123,6 +154,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
+    /**
+     * Adds a simple user.
+     *
+     * @param user the simple user to add.
+     * @return true if the simple user is successfully added, false otherwise.
+     * @throws NullPointerException if the user is null.
+     */
     public boolean addSimpleUser(User user) throws NullPointerException {
         if(simpleUserSimpleUserRepository.findByEmail((user.getEmail())).isEmpty()){
             setupDefaultUser(user);
@@ -132,6 +170,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
+    /**
+     * Adds an admin user.
+     *
+     * @param user the admin user to add.
+     * @return true if the admin user is successfully added, false otherwise.
+     * @throws NullPointerException if the user is null.
+     */
     public boolean addAdminUser(User user) throws NullPointerException {
         if(adminUserUserRepository.findByEmail(user.getEmail()).isEmpty()){
             setupDefaultUser(user);
@@ -143,6 +188,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
+    /**
+     * Adds a super user.
+     *
+     * @param user the superuser to add.
+     * @return true if the superuser is successfully added, false otherwise.
+     * @throws NullPointerException if the user is null.
+     */
     public boolean addSuperUser(User user) throws NullPointerException {
         if(superUserRepository.findByEmail(user.getEmail()).isEmpty()) {
             SuperUser superUser = new SuperUser(user);
@@ -160,6 +212,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         return false;
     }
 
+    /**
+     * Sets up default values for a new user.
+     *
+     * @param user the user to set up.
+     */
     private void setupDefaultUser(User user){
         eventManager.notify(Actions.CREATE_USER,
                 SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken ?

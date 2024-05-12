@@ -19,9 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Controller class for managing users and petitions by admins and super users.
+ */
 @Controller
 @RequestMapping("/admin")
 public class ManageUsersController {
+    /**
+     * Default constructor for the ManageUsersController.
+     */
+    public ManageUsersController() {}
 
     @Autowired
     CustomUserDetailsService customUserDetailsService;
@@ -39,17 +46,25 @@ public class ManageUsersController {
     static final List<User> usersToBlock = new ArrayList<>();
     static final List<AbstractPetition> petitionsToBlock = new ArrayList<>();
 
+    /**
+     * Displays the admin home page with user and petition statistics.
+     *
+     * @param model Model object to add attributes for the view.
+     * @return View name for the admin home page.
+     */
     @GetMapping("")
     public String adminHome(Model model){
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Roles role = userDetailsPrincipal.getRole();
 
+        // Add user and petition statistics to the model
         model.addAttribute("simpleUsersCount", simpleUserRepository.count());
         model.addAttribute("companyUsersCount", companyUserRepository.count());
         model.addAttribute("adminUsersCount", adminUserRepository.count());
         model.addAttribute("superUsersCount", superUserRepository.count());
         model.addAttribute("petitionsCount", simplePetitionRepository.count());
 
+        // Add users to the model based on the role
         if(usersToBlock.isEmpty()){
             switch(role){
                 case ADMIN -> model.addAttribute("users", simpleUserRepository.findAll());
@@ -69,22 +84,41 @@ public class ManageUsersController {
             usersToBlock.clear();
         }
 
+        // Add petitions to the model
         model.addAttribute("petitions", petitionsToBlock.isEmpty() ? simplePetitionRepository.findAll() : new ArrayList<>(petitionsToBlock));
 
         return "admin-home";
     }
 
+    /**
+     * Displays the user addition form.
+     *
+     * @param model Model object to add attributes for the view.
+     * @return View name for the user addition form.
+     */
     @GetMapping("/add")
     public String addUser(Model model){
         model.addAttribute(new User());
         return "super-add";
     }
 
+    /**
+     * Adds a new user.
+     *
+     * @param user User object containing user data.
+     * @return Redirects to the user addition form with success or failure message.
+     */
     @PostMapping("/add")
     public String addUser(User user){
         return customUserDetailsService.addUser(user) ? "redirect:/admin/add?success" : "redirect:/admin/add?failure";
     }
 
+    /**
+     * Searches for users and adds them to the block list based on the search query.
+     *
+     * @param search Search query for finding users.
+     * @return Redirects to the admin home page.
+     */
     @GetMapping("/block/users")
     public String blockUser(@RequestParam(name = "search", defaultValue = "")String search){
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -107,6 +141,12 @@ public class ManageUsersController {
         return "redirect:/admin";
     }
 
+    /**
+     * Blocks users based on their email addresses.
+     *
+     * @param email Email address of the user to be blocked.
+     * @return Redirects to the admin home page.
+     */
     @PostMapping("/block/users")
     public String blockUsers(@RequestParam(name = "email") String email){
         simpleUserRepository.findByEmail(email).ifPresentOrElse(user -> {
@@ -132,6 +172,12 @@ public class ManageUsersController {
         return "redirect:/admin";
     }
 
+    /**
+     * Unblocks users based on their email addresses.
+     *
+     * @param email Email address of the user to be unblocked.
+     * @return Redirects to the admin home page.
+     */
     @PostMapping("/unblock/users")
     public String unblockUsers(@RequestParam(name = "email") String email){
         simpleUserRepository.findByEmail(email).ifPresentOrElse(user -> {
@@ -151,6 +197,12 @@ public class ManageUsersController {
         return "redirect:/admin";
     }
 
+    /**
+     * Blocks petitions based on the search query.
+     *
+     * @param search Search query for finding petitions.
+     * @return Redirects to the admin home page.
+     */
     @GetMapping("/block/petitions")
     public String blockPetitions(@RequestParam(name = "search", defaultValue = "") String search){
         petitionsToBlock.clear();
@@ -165,6 +217,12 @@ public class ManageUsersController {
         return "redirect:/admin";
     }
 
+    /**
+     * Blocks a petition based on its ID.
+     *
+     * @param id ID of the petition to be blocked.
+     * @return Redirects to the admin home page.
+     */
     @PostMapping("/block/petitions")
     public String blockPetitions(@RequestParam(name = "id") UUID id){
         simplePetitionRepository.findById(id).ifPresent(petition -> {
@@ -175,6 +233,12 @@ public class ManageUsersController {
         return "redirect:/admin";
     }
 
+    /**
+     * Unblocks a petition based on its ID.
+     *
+     * @param id ID of the petition to be unblocked.
+     * @return Redirects to the admin home page.
+     */
     @PostMapping("/unblock/petitions")
     public String unblockPetitions(@RequestParam(name = "id") UUID id){
         simplePetitionRepository.findById(id).ifPresent(petition -> {

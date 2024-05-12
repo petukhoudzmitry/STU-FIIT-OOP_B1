@@ -12,9 +12,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+/**
+ * Controller class for handling home-related endpoints.
+ */
 @Controller
 @RequestMapping("/home")
 public class HomeController {
+    /**
+     * Default constructor for the HomeController.
+     */
+    public HomeController() {}
 
     @Autowired
     private SimpleUserRepository simpleUserRepository;
@@ -31,13 +38,21 @@ public class HomeController {
     static List<AbstractPetition> foundedPetitions = new ArrayList<>();
     static final List<CompanyUser> foundedCompanies = new ArrayList<>();
 
+    /**
+     * Handles GET requests for the home page.
+     *
+     * @param model Model object to add attributes for the view.
+     * @return View name for the home page.
+     */
     @GetMapping("")
     public String home(Model model) {
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Roles role = userDetailsPrincipal.getRole();
 
+        // Add companies to model
         model.addAttribute("companies", foundedCompanies.isEmpty() ? companyUserRepository.findAll() : new ArrayList<>(foundedCompanies));
 
+        // Add users to model
         if(foundedUsers.isEmpty()){
             List<User> users = new ArrayList<>(simpleUserRepository.findAll());
             users.addAll(companyUserRepository.findAll());
@@ -48,8 +63,10 @@ public class HomeController {
             model.addAttribute("users", new ArrayList<>(foundedUsers));
         }
 
+        // Add petitions to model
         model.addAttribute("petitions", foundedPetitions.isEmpty() ? simplePetitionRepository.findAll() : new ArrayList<>(foundedPetitions));
 
+        // Add specific attributes based on user role
         switch(role){
             case Roles.USER -> simpleUserRepository.findById(userDetailsPrincipal.getId()).ifPresent(
                     user -> {
@@ -61,16 +78,16 @@ public class HomeController {
             case Roles.COMPANY -> companyUserRepository.findById(userDetailsPrincipal.getId()).ifPresent(
                     user -> model.addAttribute("companyPetitions", user.getPetitions())
             );
-            case Roles.ADMIN -> {
-//                AdminUser user = adminUserRepository.findById(userDetailsPrincipal.getId()).get();
-            }
-            case Roles.SUPER -> {
-//                SuperUser user = superUserRepository.findById(userDetailsPrincipal.getId()).get();
-            }
         }
         return "home";
     }
 
+    /**
+     * Handles GET requests for searching companies.
+     *
+     * @param search Search query.
+     * @return Redirect to the home page.
+     */
     @GetMapping("/companies")
     public String companies(@RequestParam(name="search", defaultValue = "") String search) {
         foundedCompanies.clear();
@@ -78,6 +95,12 @@ public class HomeController {
         return "redirect:/home";
     }
 
+    /**
+     * Handles POST requests for retracting petitions.
+     *
+     * @param id Petition ID.
+     * @return Redirect to the home page.
+     */
     @PostMapping("/retract")
     public String home(@RequestParam(name = "id")UUID id){
         UserDetailsPrincipal userDetailsPrincipal = (UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -93,6 +116,12 @@ public class HomeController {
         return "redirect:/home";
     }
 
+    /**
+     * Handles GET requests for searching petitions.
+     *
+     * @param search Search query.
+     * @return Redirect to the home page.
+     */
     @GetMapping("/petitions")
     public String petitions(@RequestParam(name = "search", defaultValue = "") String search) {
         foundedPetitions.clear();
@@ -103,6 +132,12 @@ public class HomeController {
         return "redirect:/home";
     }
 
+    /**
+     * Handles POST requests for voting on petitions.
+     *
+     * @param id Petition ID.
+     * @return Redirect to the home page.
+     */
     @PostMapping("/petitions/vote")
     public String vote(@RequestParam(name = "id") UUID id){
         simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).ifPresent(
@@ -116,6 +151,12 @@ public class HomeController {
         return "redirect:/home";
     }
 
+    /**
+     * Handles POST requests for retracting votes on petitions.
+     *
+     * @param id Petition ID.
+     * @return Redirect to the home page.
+     */
     @PostMapping("/petitions/retract")
     public String retract(@RequestParam(name = "id") UUID id){
         simpleUserRepository.findById(((UserDetailsPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()).ifPresent(
@@ -129,6 +170,12 @@ public class HomeController {
         return "redirect:/home";
     }
 
+    /**
+     * Handles GET requests for searching users.
+     *
+     * @param search Search query.
+     * @return Redirect to the home page.
+     */
     @GetMapping("/users")
     public String searchUsers(@RequestParam(name="search", defaultValue = "") String search){
         foundedUsers.clear();
