@@ -20,6 +20,9 @@ PC Platform is a web application that provides users with an interactive environ
 ## FAQ
   * On the very first run in terminal you'll be prompted with super-user credentials to access super-user account. After creating new super-user account, default super-user account will be deleted and the newly created account will possess root privileges
 
+## Docs
+  * Javadoc
+
 ## Course project requirements
 - [x] **Use of design patterns**:
   * **Observer** - [Observer path](src/main/java/com/petition/platform/ooprequirements/EventManager.java "Observer")
