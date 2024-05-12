@@ -22,12 +22,12 @@ PC Platform is a web application that provides users with an interactive environ
 
 ## Course project requirements
 - [x] Use of design patterns:
-  * Observer - [Observer path](/blob/main/src/main/java/com/petition/platform/ooprequirements/EventManager.java "Observer")
-  * Abstract Factory - [Abstract Factory path](/blob/main/src/main/java/com/petition/platform/ooprequirements/UserFactory.java "Abstract Factory")
-  * Double-Cheked Locking - [Double-Cheked Locking path](/blob/main/src/main/java/com/petition/platform/ooprequirements/EventManager.java "Double-Checked Locking")
-  * Singletone - [Singletone](/blob/main/src/main/java/com/petition/platform/ooprequirements/EventManager.java "Singletone")
-  * MVC - [controllers](/tree/main/src/main/java/com/petition/platform/controllers "controllers") / [models](/tree/main/src/main/java/com/petition/platform/models "models") / [views](/tree/main/src/main/resources/templates "templates")
-  * DAO - [repositories](/tree/main/src/main/java/com/petition/platform/repositories "repositories")
+  * Observer - [Observer path](src/main/java/com/petition/platform/ooprequirements/EventManager.java "Observer")
+  * Abstract Factory - [Abstract Factory path](src/main/java/com/petition/platform/ooprequirements/UserFactory.java "Abstract Factory")
+  * Double-Cheked Locking - [Double-Cheked Locking path](src/main/java/com/petition/platform/ooprequirements/EventManager.java "Double-Checked Locking")
+  * Singletone - [Singletone](src/main/java/com/petition/platform/ooprequirements/EventManager.java "Singletone")
+  * MVC - [controllers](src/main/java/com/petition/platform/controllers "controllers") / [models](src/main/java/com/petition/platform/models "models") / [views](src/main/resources/templates "templates")
+  * DAO - [repositories](src/main/java/com/petition/platform/repositories "repositories")
   * Dependency Injection - All services are injected into controllers
   * Inversion of Control - Spring ApplicationContext
   * Aggregation - [Aggregation](src/main/java/com/petition/platform/models/SimpleUser.java "Aggregation") - list of SimplePetitions in SimpleUser class
