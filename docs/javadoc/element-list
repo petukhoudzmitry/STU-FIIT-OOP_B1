@@ -1,0 +1,9 @@
+com.petition.platform
+com.petition.platform.configs
+com.petition.platform.controllers
+com.petition.platform.models
+com.petition.platform.ooprequirements
+com.petition.platform.repositories
+com.petition.platform.roles
+com.petition.platform.services
+com.petition.platform.utils
